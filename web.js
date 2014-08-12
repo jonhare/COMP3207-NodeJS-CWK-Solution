@@ -12,16 +12,18 @@ var app = express();
 app.use(logfmt.requestLogger());
 
 app.get('/', function(req, res) {
-  res.render('index.jade', {tcpURI: tcpURI})
+  res.render('index.jade', {})
 });
 
 var server = http.createServer(app);
 server.listen(httpPort);
 
 //Setup the ws server
-var wss = new ws.Server({server: server});
+var wss = new ws.Server({server: server, path: "/ws"});
 console.log('websocket server created');
-ws.on('message', function(message) {
-	console.log('received: %s', message);
-    ws.send(message);
+wss.on('connection', function(conn) {
+    conn.on('message', function(message) {
+        console.log('received: %s', message);
+    	conn.send(message);
+    });
 });
