@@ -14,12 +14,10 @@ app.get('/', function(req, res) {
   res.render('index.jade', {tcpURI: tcpURI})
 });
 
-app.listen(httpPort, function() {
-  console.log("Listening on " + port);
-});
+var server = http.createServer(app);
+server.listen(httpPort);
 
 //Setup the ws server
-
 var wss = new ws.Server({server: server});
 console.log('websocket server created');
 ws.on('message', function(message) {
