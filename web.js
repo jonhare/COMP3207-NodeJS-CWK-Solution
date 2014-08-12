@@ -1,6 +1,7 @@
 var express = require("express");
 var logfmt = require("logfmt");
 var net = require('net');
+var ws = require('ws');
 
 //configure ports
 var httpPort = Number(process.env.PORT || 5000);
@@ -20,7 +21,7 @@ app.listen(httpPort, function() {
 
 //Setup the ws server
 
-var wss = new WebSocketServer({server: server});
+var wss = new ws.Server({server: server});
 console.log('websocket server created');
 ws.on('message', function(message) {
 	console.log('received: %s', message);
