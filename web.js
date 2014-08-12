@@ -1,7 +1,6 @@
 var express = require("express");
 var logfmt = require("logfmt");
-var net = require('net');
-var ws = require('ws');
+var ws = require("ws");
 
 //configure ports
 var httpPort = Number(process.env.PORT || 5000);
