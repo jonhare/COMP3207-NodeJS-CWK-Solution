@@ -3,10 +3,7 @@ var logfmt = require("logfmt");
 var net = require('net');
 
 //configure ports
-var tcpPort = Number(process.env.RUPPELLS_SOCKETS_LOCAL_PORT || 1337);
 var httpPort = Number(process.env.PORT || 5000);
-
-var tcpServer = process.env.RUPPELLS_SOCKETS_FRONTEND_URI || "localhost:" + tcpPort;
 
 //Setup the HTTP application
 var app = express();
@@ -21,6 +18,19 @@ app.listen(httpPort, function() {
   console.log("Listening on " + port);
 });
 
-//Setup the tcp server
-net.createServer(socketHandler).listen(ruppells_sockets_local_port);
+//Setup the ws server
 
+var wss = new WebSocketServer({server: server});
+console.log('websocket server created');
+wss.on('connection', function(ws) {
+  var id = setInterval(function() {
+    ws.send(JSON.stringify(new Date()), function() {  });
+  }, 1000);
+
+  console.log('websocket connection open');
+
+  ws.on('close', function() {
+    console.log('websocket connection close');
+    clearInterval(id);
+  });
+});
