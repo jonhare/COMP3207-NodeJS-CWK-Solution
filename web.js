@@ -2,28 +2,47 @@ var http = require("http");
 var express = require("express");
 var logfmt = require("logfmt");
 var ws = require("ws");
+var handler = require('./scripts/handler');
 
 //configure ports
 var httpPort = Number(process.env.PORT || 5000);
 
-//Setup the HTTP application
-var app = express();
+//Configure the database
+db.sequelize.sync().complete(function(err) {
+	if (err) {
+		throw err[0];
+	} else {
+		handler.startup();
 
-app.use(logfmt.requestLogger());
+		//Setup the HTTP application
+		var app = express();
 
-app.get('/', function(req, res) {
-  res.render('index.jade', {})
-});
+		app.use(logfmt.requestLogger());
 
-var server = http.createServer(app);
-server.listen(httpPort);
+		app.get('/', function(req, res) {
+			res.render('index.jade', {});
+		});
 
-//Setup the ws server
-var wss = new ws.Server({server: server, path: "/ws"});
-console.log('websocket server created');
-wss.on('connection', function(conn) {
-    conn.on('message', function(message) {
-        console.log('received: %s', message);
-    	conn.send(message);
-    });
+		var server = http.createServer(app);
+		server.listen(httpPort);
+
+		//Setup the ws server
+		var wss = new ws.Server({server: server, path: "/ws"});
+		console.log('websocket server created');
+		wss.on('connection', function(conn) {
+			var address = conn.upgradeReq.headers['x-forwarded-for'] || conn.upgradeReq.connection.remoteAddress;
+			console.log('Init new connection with IP ' + address);
+
+			handler.splashScreen(conn);
+
+			conn.on('message', function(message) {
+				handler.handleMessage(conn, message);
+			});
+
+			conn.on('close', function() {
+				console.log('Close connection with IP ' + address);
+				handler.deactivatePlayer(conn);
+			});
+		});
+	}
 });

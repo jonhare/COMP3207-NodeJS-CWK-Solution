@@ -11,7 +11,7 @@
     "url": "https://github.com/jonhare/COMP3207-JSH2.git"
   },
   "author": "Jonathon Hare",
-  "license": "ISC",
+  "license": "Southampton",
   "bugs": {
     "url": "https://github.com/jonhare/COMP3207-JSH2/issues"
   },
@@ -20,6 +20,9 @@
     "express": "^4.8.3",
     "jade": "^1.5.0",
     "logfmt": "^1.1.2",
+    "pg": "^3.4.1",
+    "sequelize": "^1.7.9",
+    "string": "^1.9.1",
     "ws": "^0.4.32"
   },
   "engines": {
