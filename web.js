@@ -40,7 +40,6 @@ db.sequelize.sync().complete(function(err) {
         			conn.ping();
         		} catch (e) {
         			clearInterval(id);
-        			console.log(e);
         		}
     		}, 10000);
 

@@ -1,7 +1,7 @@
 doctype html
 html(lang="en")
 	head
-		title COMP3207: NanoMUD
+		title COMP3207 :: ECS-MUD
 		script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js')
 		script(type='text/javascript', src='http://terminal.jcubic.pl/js/jquery.terminal-0.8.8.min.js')
 		script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.11/jquery.mousewheel.min.js')
@@ -11,25 +11,41 @@ html(lang="en")
 					$('#terminal').fadeOut("fast");
 					$('<p>You need a browser that supports WebSockets.').appendTo('#container');
 				} else {
-					var ws = new WebSocket('ws://' + window.location.host + '/ws');
+					var ws;
 
 					var term = $('#terminal').terminal(function(command, term) {
-						ws.send(command);
+						if (ws) ws.send(command);
 					}, {
-						name: 'NanoMUD',
+						name: 'ECS-MUD',
 						greetings: '',
 						prompt: '',
-						width: 700,
-						height: 400
+						width: 800,
+						height: 340
 					});
 
-					ws.onmessage = function(msg) {
-						term.echo(msg.data);
-					}
+					term.echo("Disconnected.");
+					term.pause();
 
-					ws.onclose = function() {
-						init();
-					}
+					$('#connect').on('click', function() {
+						if (ws) {
+							term.clear();
+							term.echo('Disconnected.');
+							term.pause();
+							$('#connect').html('Connect');
+							ws.close();
+							ws = undefined;
+						} else {
+							term.clear();
+							$('#connect').html('Disconnect');
+							ws = new WebSocket('ws://' + window.location.host + '/ws');
+							ws.onmessage = function(msg) {
+								term.echo(msg.data);
+							};
+
+							term.resume();
+							term.focus(true);
+						}
+					});
 				}
 			}
 
@@ -39,8 +55,7 @@ html(lang="en")
 		link(rel='stylesheet', href='http://terminal.jcubic.pl/css/jquery.terminal.css')
 		style.
 			body {
-				font-family: monospace;
-				font-size: 13px;
+				font-family: "Courier New";
 				background: #333333; 
 			}
 			h1 { 
@@ -51,15 +66,15 @@ html(lang="en")
 			#terminal {
 				margin-left: auto;
 				margin-right: auto;
-				font-family: "Courier New";
-				font-size: 12px;
 			}
 			.terminal, .cmd {
 				background-color: #333333;
-				color: #669999; 
+				color: #669999;
+				font-size: 16px;
 			}
 	body
 		div#wrapper
 			div#container
-				h1 NanoMUD
+				h1 COMP3207 :: ECS-MUD
 				div#terminal
+				button#connect Connect

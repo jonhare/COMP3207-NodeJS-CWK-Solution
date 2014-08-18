@@ -5,7 +5,7 @@ var db = require('../models');
 var defaultRoomModel = {
 	type: 'ROOM',
 	name: 'Starting room',
-	description: "Starting room. You are standing in a fabulous, "
+	description:  "You are standing in a fabulous, "
 				+ "fabulous, exotic room, with all sorts of things that go 'hum' "
 				+ "and 'plink' in the night.\n\nAs you glance around the room, "
 				+ "you wonder what else might exist in this world.",
@@ -148,7 +148,7 @@ var MessageHandler = {
 	postLogin: true,
 	validate: function(conn, argsArr, cb) {
 		if (argsArr.length == 0)
-			cb(conn, argsArr);
+			cb.apply(this, [conn, argsArr]);
 		else
 			handler.sendMessage(conn, strings.unknownCommand);
 	},
@@ -162,7 +162,7 @@ var PropertyHandler = createObject(MessageHandler, {
 	nargs: 1,
 	validate: function(conn, argsArr, cb) {
 		if (argsArr.length === 1)
-			cb(conn, argsArr);
+			cb.apply(this, [conn, argsArr]);
 		else
 			handler.sendMessage(conn, strings.unknownCommand);
 	},
@@ -172,7 +172,8 @@ var PropertyHandler = createObject(MessageHandler, {
 		var targetName = argsArr[0].substring(0, index);
 		var value = argsArr[0].substring(index + 1);
 		//FIXME!!
-		console.log(this);
+		console.log("here");
+		console.log(this.prop);
 		updateProperty(conn, targetName, this.prop, value);
 	}
 })
