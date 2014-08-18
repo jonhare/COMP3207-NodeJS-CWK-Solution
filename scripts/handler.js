@@ -410,6 +410,16 @@ handler = {
 							} else if (obj.locationId === player.locationId) {
 								handler.messages.look.lookObject(conn, obj);
 								return;
+							} else {
+								player.getLocation().success(function(loc) {
+									loc.getExits({ where: {id: obj.id} }).success(function(exits) {
+										if (exits && exits.length>0) {
+											handler.messages.look.lookObject(conn, obj);
+										} else {
+											handler.sendMessage(conn, strings.dontSeeThat, obj ? obj : {name: argsArr[0]});
+										}
+									});
+								});
 							}
 						}
 
