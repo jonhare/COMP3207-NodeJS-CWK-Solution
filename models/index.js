@@ -3,7 +3,7 @@ if (!global.hasOwnProperty('db')) {
   var sequelize = null;
  
   //choose database based on environment
-  var dbUrl = process.env.HEROKU_POSTGRESQL_BRONZE_URL || "postgres://jsh2:@localhost:5432/comp3207";
+  var dbUrl = process.env.HEROKU_POSTGRESQL_GREEN_URL || "postgres://jsh2:@localhost:5432/comp3207";
   var match = dbUrl.match(/postgres:\/\/([^:]+):([^@]*)@([^:]+):(\d+)\/(.+)/);
 
   sequelize = new Sequelize(match[5], match[1], match[2], {
