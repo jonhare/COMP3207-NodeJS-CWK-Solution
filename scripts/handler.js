@@ -104,7 +104,7 @@ function updateProperty(conn, targetName, propertyName, value) {
 				updatePropertyInternal(conn, objs, propertyName, value);
 			} else {
 				loadMUDObjects(conn, {name: targetName, ownerId: me.id}, function(objs) {
-					if (objs) {
+					if (objs && objs.length>0) {
 						updatePropertyInternal(conn, objs, propertyName, value);
 					} else {
 						handler.sendMessage(conn, "cannot find object (or object isn't owned by you)");
@@ -474,7 +474,9 @@ handler = {
 			perform: function(conn, argsArr) {
 				if (isNameValid(argsArr[0])) {
 					//create a new room
-					createMUDObject(conn, {name: argsArr[0], type:'ROOM'}, function(room) {
+					var player = handler.findActivePlayerByConnection(conn);
+					
+					createMUDObject(conn, {name: argsArr[0], type:'ROOM', ownerId: player.id}, function(room) {
 						if (room) {
 							handler.sendMessage(conn, strings.roomCreated, room);
 						}
