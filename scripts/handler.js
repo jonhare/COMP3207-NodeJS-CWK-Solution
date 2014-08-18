@@ -69,6 +69,9 @@ function loadMUDObjects(conn, obj, cb) {
 function updatePropertyInternal(conn, targets, propertyName, value) {
 	var me = handler.findActivePlayerByConnection(conn);
 
+	console.log("updatePropertyInternal");
+	console.log(targets);
+
 	if (!Array.isArray(targets)) 
 		targets = [targets];
 
@@ -92,7 +95,7 @@ function updateProperty(conn, targetName, propertyName, value) {
 	if (targetName === 'me') {
 		updatePropertyInternal(conn, me, propertyName, value);
 	} else if (targetName === 'here') {
-		me.oation().success(function(loc) {
+		me.getLocation().success(function(loc) {
 			updatePropertyInternal(conn, loc, propertyName, value);
 		});
 	} else {
