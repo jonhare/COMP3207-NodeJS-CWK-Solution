@@ -3,10 +3,9 @@ var strings = require('./strings');
 var db = require('../models');
 
 var defaultRoomModel = {
-	id : 1,
 	type: 'ROOM',
 	name: 'Starting room',
-	description: "Starting room (room 1). You are standing in a fabulous, "
+	description: "Starting room. You are standing in a fabulous, "
 				+ "fabulous, exotic room, with all sorts of things that go 'hum' "
 				+ "and 'plink' in the night.\n\nAs you glance around the room, "
 				+ "you wonder what else might exist in this world.",
@@ -38,11 +37,11 @@ function isLinkable(){
 }
 
 function createMUDObject(conn, obj, cb) {
-	db.MUDObject.build(obj).save().complete(function(err) {
+	db.MUDObject.build(obj).save().complete(function(err, nobj) {
 		if (!!err) {
 			fatalError(err, conn);
 		} else {
-			loadMUDObject(conn, obj, cb);
+			cb(nobj);
 		}
 	});
 }
@@ -93,7 +92,7 @@ function updateProperty(conn, targetName, propertyName, value) {
 	if (targetName === 'me') {
 		updatePropertyInternal(conn, me, propertyName, value);
 	} else if (targetName === 'here') {
-		me.getLocation().success(function(loc) {
+		me.oation().success(function(loc) {
 			updatePropertyInternal(conn, loc, propertyName, value);
 		});
 	} else {
@@ -230,6 +229,7 @@ handler = {
 							handler.activePlayers.push(player);
 							handler.broadcastExcept(conn, strings.hasConnected, player);
 
+							handler.clearScreen(conn);
 							handler.messages.look.perform(conn, []);
 						});
 					}
@@ -271,6 +271,7 @@ handler = {
 						handler.activePlayers.push(player);
 						handler.broadcastExcept(conn, strings.hasConnected, player);
 
+						handler.clearScreen(conn);
 						handler.messages.look.perform(conn, []);
 					}
 				});
@@ -296,7 +297,7 @@ handler = {
 				for (var i=0; i<handler.activeConnections.length; i++) {
 					var other = handler.activePlayers[i];
 
-					if (other.location === me.location && me !== other) {
+					if (other.locationId === me.locationId && me !== other) {
   						handler.sendMessage(handler.activeConnections[i], strings.says, {name: me.name, message: message});
   					}
   				}
@@ -318,14 +319,14 @@ handler = {
 				var me = handler.findActivePlayerByConnection(conn);
 				var target = handler.findActivePlayerByName(targetName);
 				var targetConn = handler.findActiveConnectionByPlayer(target);
-				if (target && target.location === me.location) {
+				if (target && target.locationId === me.locationId) {
 					handler.sendMessage(conn, strings.youWhisper, {message: message, name: target.name});
 					handler.sendMessage(targetConn, strings.toWhisper, {message: message, name: me.name});
 
 					for (var i=0; i<handler.activeConnections.length; i++) {
 						var other = handler.activePlayers[i];
 
-						if (other.location === me.location && me !== other && target !== other) {
+						if (other.locationId === me.locationId && me !== other && target !== other) {
 							//1 in 10 chance that someone will hear what you whispered!
 							if (Math.random() < 0.9) {
   								handler.sendMessage(handler.activeConnections[i], strings.whisper, {fromName: me.name, toName: target.name});
@@ -352,39 +353,37 @@ handler = {
 		go: createObject(MessageHandler, {
 			nargs: 1,
 			validate: function(conn, argsArr, cb) {
-				if (argsArr.length == 1 && (
-					argsArr[0] === 'n' || argsArr[0] === 'north' ||
-					argsArr[0] === 'e' || argsArr[0] === 'east' ||
-					argsArr[0] === 's' || argsArr[0] === 'south' ||
-					argsArr[0] === 'w' || argsArr[0] === 'west')) {
-					argsArr[0] = argsArr[0].substring(0, 1);
+				if (argsArr.length == 1) {
 					cb(conn, argsArr);
 				} else {
 					handler.sendMessage(conn, strings.unknownCommand);
 				}
 			},
 			perform: function(conn, argsArr) {
-				handler.sendMessage(conn, "Going " + argsArr[0])
-  			}
-		}),
-		north: createObject(MessageHandler, {
-			perform: function(conn, argsArr) {
-				handler.messages.go.perform(conn, ["n"]);
-  			}
-		}),
-		east: createObject(MessageHandler, {
-			perform: function(conn, argsArr) {
-				handler.messages.go.perform(conn, ["e"]);
-  			}
-		}),
-		south: createObject(MessageHandler, {
-			perform: function(conn, argsArr) {
-				handler.messages.go.perform(conn, ["s"]);
-  			}
-		}),
-		west: createObject(MessageHandler, {
-			perform: function(conn, argsArr) {
-				handler.messages.go.perform(conn, ["w"]);
+				var player = handler.findActivePlayerByConnection(conn);
+				var exitName = argsArr[0];
+
+				player.getLocation().success(function(loc) {
+					loc.getExits({ where : {name: exitName} }).success(function(exits) {
+						if (!exits || exits.length === 0) {
+							handler.sendMessage(conn, "You can't go {{dir}} from here.", {dir: exitName});
+						} else {
+							exits[0].getLocation().success(function(loc) {
+								for (var i=0; i<handler.activeConnections.length; i++) {
+									var other = handler.activePlayers[i];
+
+									if (other.locationId === loc.id && player !== other) {
+	  									handler.sendMessage(handler.activeConnections[i], strings.enters, {name: player.name});
+	  								}
+	  							}
+
+								player.setLocation(loc).success(function(){
+									handler.messages.look.lookRoom(conn, loc);
+								});
+							});
+						}
+					});
+				});
   			}
 		}),
 		look: createObject(MessageHandler, {
@@ -420,20 +419,41 @@ handler = {
 			},
 			lookRoom: function(conn, room) {
 				handler.messages.look.lookObject(conn, room);
-				handler.sendMessage(conn, "");
+				handler.sendMessage(conn);
 				handler.sendMessage(conn, strings.peopleHere);
 				for (var i=0; i<handler.activePlayers.length; i++) {
 					if (handler.activePlayers[i].locationId === room.id) {
 						handler.sendMessage(conn, handler.activePlayers[i].name);
 					}
 				}
-				handler.sendMessage(conn, "");
-				handler.sendMessage(conn, strings.youSee);
+				
+				loadMUDObjects(conn, {type: 'THING', locationId: room.id}, function(objs) {
+					if (objs && objs.length>0) {
+						handler.sendMessage(conn);
+						handler.sendMessage(conn, strings.youSee);
+						handler.messages.look.lookObjects(conn, objs);
+					}
+
+					room.getExits().success(function(exits) {
+						handler.sendMessage(conn);
+						if (exits && exits.length>0) {
+							handler.sendMessage(conn, "Exits:");
+							handler.messages.look.lookObjects(conn, exits);
+						} else {
+							handler.sendMessage(conn, "You can't see any exits from this room.");
+						}
+					});
+				});
 			},
 			lookObject: function(conn, obj) {
 				handler.sendMessage(conn, obj.name);
-				handler.sendMessage(conn, "");
+				handler.sendMessage(conn);
 				handler.sendMessage(conn, obj.description);
+			},
+			lookObjects: function(conn, objs) {
+				for (var i=0; i<objs.length; i++) {
+					handler.messages.look.lookObject(conn, objs[i]);
+				}
 			}
 		}),
 		"@dig": createObject(PropertyHandler, {
@@ -465,31 +485,66 @@ handler = {
 		"@ofailure": createObject(PropertyHandler, {
 			prop: 'otherFailureMessage'
 		}),
-		"@open": createObject(PropertyHandler, {
+		"@open": createObject(MessageHandler, {
+			nargs: 1,
+			validate: function(conn, argsArr, cb) {
+				if (argsArr.length === 1) {
+					if (isNameValid(argsArr[0])) {
+						cb(conn, argsArr);
+					} else {
+						handler.sendMessage(conn, strings.invalidName);	
+					}
+				} else {
+					handler.sendMessage(conn, strings.unknownCommand);
+				}
+			},
+			perform: function(conn, argsArr) {
+				var player = handler.findActivePlayerByConnection(conn);
+				var exitName = argsArr[0];
+
+				player.getLocation().success(function(loc) {
+					if (isLinkable(loc, player)) {
+						loc.getExits({ where : {name: exitName} }).success(function(exits) {
+							if (!exits || exits.length === 0) {
+								createMUDObject(conn, {name: exitName, type: 'EXIT', ownerId: player.id}, function(exit) {
+									console.log("created");
+									loc.addExit(exit).success(function() {
+										handler.sendMessage(conn, "Exit created");
+									});
+								});
+							} else {
+								handler.sendMessage(conn, "Exit already exists");
+							}
+						});
+					} else {
+						handler.sendMessage(conn, "Cannot open exit here");
+					}
+				});
+			}
+		}),
+		"@link": createObject(PropertyHandler, {
 			perform: function(conn, argsArr) {
 				var player = handler.findActivePlayerByConnection(conn);
 
 				var index = argsArr[0].indexOf("=");
-				var targetName = argsArr[0].substring(0, index);
-				var value = argsArr[0].substring(index + 1);
+				var targetName = argsArr[0].substring(0, index).trim();
+				var value = argsArr[0].substring(index + 1).trim();
 
 				player.getLocation().success(function(loc) {
-					if (isLinkable(loc, player)) {
-						loc.getExits({ where : {name: value}}).success(function(exits) {
-							if (!exits || exits.length === 0) {
-								createObject(conn, {name: value, type: 'EXIT'}, function(exit) {
-									loc.addExit(exit).success(function() {
-										//do nothing
-										console.log("Exit created");
+					loc.getExits({ where: {name: targetName} }).success(function(exits) {
+						console.log(exits);
+						if (exits && exits.length === 1) {
+							var exit = exits[0];
+
+							loadMUDObject(conn, {id: value}, function(room) {
+								if (room) {
+									exit.setLocation(room).success(function() {
+										handler.sendMessage(conn, "Room linked");
 									});
-								});
-							} else {
-								handler.sendMessage("Exit already exists");
-							}
-						});
-					} else {
-						handler.sendMessage("Cannot open exit here");
-					}
+								}
+							});
+						}
+					});
 				});
 			}
 		}),
@@ -522,7 +577,7 @@ handler = {
 					}
 				}
 			} else {
-				if (isLoggedIn)
+				if (isLoggedIn) 
 					handler.sendMessage(conn, strings.unknownCommand);
 				else
 					handler.splashScreen(conn);
@@ -540,10 +595,10 @@ handler = {
 
 			handler.activeConnections.splice(index, 1);
 			handler.activePlayers.splice(index, 1);
-			conn.terminate();
 
 			handler.broadcast(strings.hasDisconnected, player);
 		}
+		conn.terminate();
 	},
 	/*
 	 * Broadcast sends to all logged in users.
@@ -566,11 +621,18 @@ handler = {
 	 * Sends a message to a connection, adding a newline automatically
 	 */
 	sendMessage: function(conn, message, values) {
+		message = message === undefined ? '' : message;
 		if (values === undefined) 
 			conn.send(message);
 		else
 			conn.send(S(message).template(values).s);
-		conn.send("\n");
+	},
+	/*
+	 * Clear the screen 
+	 */
+	clearScreen: function(conn) {
+		for (var i=0; i<24; i++) 
+			handler.sendMessage(conn);
 	},
 	splashScreen: function(conn) {
 		handler.sendMessage(conn, strings.loginPrompt);
@@ -591,25 +653,21 @@ handler = {
 	},
 	startup: function() {
 		//setup the default location
-		db.MUDObject.count().success(function(c) {
-  			if (c == 0) {
-  				createMUDObject(undefined, defaultRoomModel, function(room) {
+		loadMUDObject(undefined, {type: 'ROOM'}, function(room) {
+			if (room) {
+				handler.defaultRoom = room;
+			} else {
+				createMUDObject(undefined, defaultRoomModel, function(room) {
   					handler.defaultRoom = room;
   				});
-  			} else {
-  				loadMUDObject(undefined, {id: 1}, function(room){
-  					handler.defaultRoom = room;
-  				});
-  			}
+			}
 		});
 
 		//command aliases
 		handler.messages['goto'] = handler.messages.go;
 		handler.messages.move = handler.messages.go;
-		handler.messages.n = handler.messages.north;
-		handler.messages.e = handler.messages.east;
-		handler.messages.s = handler.messages.south;
-		handler.messages.w = handler.messages.west;
+		handler.messages.cr = handler.messages.create;
+		handler.messages.co = handler.messages.connect;
 	}
 };
 

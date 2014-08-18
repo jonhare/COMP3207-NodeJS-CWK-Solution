@@ -2,5 +2,64 @@ doctype html
 html(lang="en")
 	head
 		title COMP3207: NanoMUD
+		script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js')
+		script(type='text/javascript', src='http://terminal.jcubic.pl/js/jquery.terminal-0.8.8.min.js')
+		script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.11/jquery.mousewheel.min.js')
+		script(type='text/javascript').
+			function init() {
+				if (!("WebSocket" in window)) {
+					$('#terminal').fadeOut("fast");
+					$('<p>You need a browser that supports WebSockets.').appendTo('#container');
+				} else {
+					var ws = new WebSocket('ws://' + window.location.host + '/ws');
+
+					var term = $('#terminal').terminal(function(command, term) {
+						ws.send(command);
+					}, {
+						name: 'NanoMUD',
+						greetings: '',
+						prompt: '',
+						width: 700,
+						height: 400
+					});
+
+					ws.onmessage = function(msg) {
+						term.echo(msg.data);
+					}
+
+					ws.onclose = function() {
+						init();
+					}
+				}
+			}
+
+			$(init);
+
+		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Courier+New')
+		link(rel='stylesheet', href='http://terminal.jcubic.pl/css/jquery.terminal.css')
+		style.
+			body {
+				font-family: monospace;
+				font-size: 13px;
+				background: #333333; 
+			}
+			h1 { 
+				font-size: 22px; 
+				color: #669999; 
+				text-align: center;
+			}
+			#terminal {
+				margin-left: auto;
+				margin-right: auto;
+				font-family: "Courier New";
+				font-size: 12px;
+			}
+			.terminal, .cmd {
+				background-color: #333333;
+				color: #669999; 
+			}
 	body
-		
+		div#wrapper
+			div#container
+				h1 NanoMUD
+				div#terminal
