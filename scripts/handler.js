@@ -33,6 +33,10 @@ function fatalError(err, conn) {
 	throw {name: "FatalError", description: err};
 }
 
+function isLinkable(){
+	return true;
+}
+
 function createMUDObject(conn, obj, cb) {
 	db.MUDObject.build(obj).save().complete(function(err) {
 		if (!!err) {
@@ -175,18 +179,18 @@ var PropertyHandler = createObject(MessageHandler, {
 })
 
 /*
- * Helper to create new objects with inheritance. Props in ext will override those in base.
+ * Helper to create new objects with differential inheritance. Props in ext will override those in base.
  */
 function createObject(base, ext) {
-	var extpropdef = new Object();
+	var clone = Object.create(base);
 
 	for (var prop in ext) {
 		if (ext.hasOwnProperty(prop)) {
-			extpropdef[prop] = Object.getOwnPropertyDescriptor(ext, prop);
+			clone[prop] = ext[prop];
 		}
 	}
 
-	return Object.create(base, extpropdef);
+	return clone;
 }
 
 handler = {
