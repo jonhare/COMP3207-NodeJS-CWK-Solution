@@ -35,7 +35,16 @@ db.sequelize.sync().complete(function(err) {
 
 			handler.splashScreen(conn);
 
-			conn.on('message', function(message) {
+			var id = setInterval(function() {
+				try {
+        			conn.ping();
+        		} catch (e) {
+        			clearInterval(id);
+        			console.log(e);
+        		}
+    		}, 10000);
+
+    		conn.on('message', function(message) {
 				handler.handleMessage(conn, message);
 			});
 
