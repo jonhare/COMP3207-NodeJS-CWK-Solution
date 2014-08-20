@@ -18,7 +18,7 @@ This coursework is worth 33% of the overall mark for the COMP3207 module; this e
 
 ##Getting started
 1. Check that you have a copy of `COMP3207-CW1-1415` in you github repository. If you don't then email or speak to [Jon](mailto:jsh2@ecs.soton.ac.uk) immediately.
-2. Login in to [Heroku](http://www.heroku.com) (create a free account if you don't already have one) and create a new application called `COMP3207CW1-<your ECS user id>`.
+2. Login in to [Heroku](http://www.heroku.com) (create a free account if you don't already have one) and create a new application called `COMP3207-CW1-1415-<your ECS user id>` (e.g. mine is `COMP3207-CW1-1415-jsh2`).
 3. Provision a free Heroku `postgresql` database for your newly created app.
 4. Download/install [node](http://nodejs.org/download/) and [Heroku toolbelt](http://toolbelt.heroku.com/)
 	* These do not necessarily need to be installed - there are straight binary packages that you can unpack and put in your filespace if you're using university/ECS machines.
@@ -27,7 +27,7 @@ This coursework is worth 33% of the overall mark for the COMP3207 module; this e
 5. Clone your `COMP3207-CW1-1415` repository and edit the `package.json` file to fill in your details.
 6. Edit the `models/index.js` file so that it points at the database instance you provisioned.
 7. Follow the instructions in the [Heroku dev center](https://devcenter.heroku.com/articles/git) to deploy the skeleton application (skip down to the bit about using an existing git repo ('You can also take an existing Git repo...').
-8. Go to `http://COMP3207CW1-<your ECS user id>.herokuapp.com` and test the application is working.
+8. Go to `http://COMP3207-CW1-1415-<your ECS user id>.herokuapp.com` and test the application is working.
 
 ##
 

@@ -62,9 +62,10 @@ var controller = {
 		activePlayers.push({ player: player, conn: conn });
 	},
 	deactivatePlayer: function(conn) {
+		controller.broadcastExcept(conn, strings.hasDisconnected, activePlayers[i].player);
+		
 		for (var i=0; i<activePlayers.length; i++) {
 			if (activePlayers[i].conn === conn) {
-				controller.broadcast(strings.hasDisconnected, activePlayers[i].player);
 				activePlayers.splice(i, 1);
 				break;
 			}
