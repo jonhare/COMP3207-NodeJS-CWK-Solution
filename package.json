@@ -19,7 +19,6 @@
   "dependencies": {
     "express": "^4.8.3",
     "jade": "^1.5.0",
-    "logfmt": "^1.1.2",
     "pg": "^3.4.1",
     "sequelize": "^1.7.9",
     "string": "^1.9.1",

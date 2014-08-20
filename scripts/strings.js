@@ -1,3 +1,14 @@
+/**
+ * scripts/strings.js
+ * 
+ * Strings for communicating with a player. 
+ * 
+ * Note that some strings may be parsed by the string library 
+ * (http://stringjs.com/#methods/template-values-open-close) to 
+ * perform templating, and hence the `{{...}}` constructs.
+ *
+ * @author Jonathon Hare (jsh2@ecs.soton.ac.uk)
+ */
 module.exports = {
 	loginPrompt:  
 				"                                                                                \n" + 
@@ -41,4 +52,11 @@ module.exports = {
 	peopleHere: 		"People here:",
 	youSee:  			"You see:",
 	enters: 			"{{name}} has entered the room",
+
+	// Default data for the first room
+	defaultRoomName: 	"Starting room",
+	defaultRoomDescription: "You are standing in a fabulous, "
+				+ "fabulous, exotic room, with all sorts of things that go 'hum' "
+				+ "and 'plink' in the night.\n\nAs you glance around the room, "
+				+ "you wonder what else might exist in this world.",
 };
