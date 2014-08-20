@@ -14,7 +14,7 @@ html(lang="en")
 					var ws;
 
 					var term = $('#terminal').terminal(function(command, term) {
-						if (ws) ws.send(command);
+						if (ws && ws.readyState==1) ws.send(command);
 					}, {
 						name: 'ECS-MUD',
 						greetings: '',
@@ -28,18 +28,21 @@ html(lang="en")
 
 					$('#connect').on('click', function() {
 						if (ws) {
-							term.clear();
-							term.echo('Disconnected.');
-							term.pause();
-							$('#connect').html('Connect');
 							ws.close();
-							ws = undefined;
 						} else {
 							term.clear();
 							$('#connect').html('Disconnect');
 							ws = new WebSocket('ws://' + window.location.host + '/ws');
 							ws.onmessage = function(msg) {
 								term.echo(msg.data);
+							};
+							ws.onclose = function() {
+								term.clear();
+								term.echo('Disconnected.');
+								term.pause();
+								$('#connect').html('Connect');
+								ws.close();
+								ws = undefined;
 							};
 
 							term.resume();
