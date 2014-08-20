@@ -1,22 +1,18 @@
 #COMP3207 Coursework 1
 
+	███████╗ ██████╗███████╗      ███╗   ███╗██╗   ██╗██████╗            
+	██╔════╝██╔════╝██╔════╝      ████╗ ████║██║   ██║██╔══██╗           
+	█████╗  ██║     ███████╗█████╗██╔████╔██║██║   ██║██║  ██║           
+	██╔══╝  ██║     ╚════██║╚════╝██║╚██╔╝██║██║   ██║██║  ██║           
+	███████╗╚██████╗███████║      ██║ ╚═╝ ██║╚██████╔╝██████╔╝           
+	╚══════╝ ╚═════╝╚══════╝      ╚═╝     ╚═╝ ╚═════╝ ╚═════╝            
+
+
 ##Introduction
 A MUD (*Multi-User Dungeon*) is a multi-user virtual world described entirely by text. MUDs combine elements of role-playing games, interactive fiction and online chat. Originally, MUDs were connected to over the internet via the telnet protocol (try telnetting to PennMUSH (a MUSH a variant of a MUD and stands for `Multi-User Shared Hallucination`) by clicking [here](telnet://mush.pennmush.org:4201) or typing `telnet mush.pennmush.org 4201` in a terminal). MUDs were extremely popular with undergraduate students of the late 80's and during this time it was sometimes said that the MUD acroynm stood for "Multiple Undergraduate Destroyer" sue to their popularity amongst students and the amount of time devoted to them.
+	                                                                    
+In this coursework you are going to build a MUD engine called `ECS-MUD` using [nodejs](http://www.nodejs.org) server-side javascript and deploy it in the cloud using the [Heroku](http://www.heroku.com) platform. Rather than using telnet as the communication protocol, ECS-MUD will communicate with clients using the new HTLM5 [WebSockets](https://www.websocket.org). Rather than starting from scratch, we have provided a basic MUD implementation to get you started, and you will need to create a number of additional features to complete the implementation.
 
-	================================================================================
-	                                                                                
-	           ███████╗ ██████╗███████╗      ███╗   ███╗██╗   ██╗██████╗            
-	           ██╔════╝██╔════╝██╔════╝      ████╗ ████║██║   ██║██╔══██╗           
-	           █████╗  ██║     ███████╗█████╗██╔████╔██║██║   ██║██║  ██║           
-	           ██╔══╝  ██║     ╚════██║╚════╝██║╚██╔╝██║██║   ██║██║  ██║           
-	           ███████╗╚██████╗███████║      ██║ ╚═╝ ██║╚██████╔╝██████╔╝           
-	           ╚══════╝ ╚═════╝╚══════╝      ╚═╝     ╚═╝ ╚═════╝ ╚═════╝            
-	                                                                                
-	================================================================================
-
-In this coursework you are going to build a MUD engine called `ECS-MUD` using [nodejs](http://www.nodejs.org) server-side javascript and deploy it in the cloud using the [Heroku](http://www.heroku.com) platform. Rather than using telnet as the communication protocol, ECS-MUD will communicate with clients using the new HTLM5 [WebSockets](https://www.websocket.org). Rather than starting from scratch, we have provided a basic MUD implementation to get you started, and you will need to implement a number of additional features to complete the implementation.
-
-	
 
 ##Effort
 This coursework is worth 33% of the overall mark for the COMP3207 module; this equates to just over 40 hours of work.
