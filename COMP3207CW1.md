@@ -17,7 +17,7 @@ In this coursework you are going to build a MUD engine called `ECS-MUD` using th
 This coursework is worth 33% of the overall mark for the COMP3207 module; this equates to just over 40 hours of work.
 
 ##Getting started
-1. Check that you have a copy of `COMP3207-CW1-1415` in you github repository. If you don't then email or speak to Jon immediately.
+1. Check that you have a copy of `COMP3207-CW1-1415` in you github repository. If you don't then email or speak to [Jon](mailto:jsh2@ecs.soton.ac.uk) immediately.
 2. Login in to [Heroku](http://www.heroku.com) (create a free account if you don't already have one) and create a new application called `COMP3207CW1-<your ECS user id>`.
 3. Provision a free Heroku `postgresql` database for your newly created app.
 4. Download/install [node](http://nodejs.org/download/) and [Heroku toolbelt](http://toolbelt.heroku.com/)
