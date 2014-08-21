@@ -10,12 +10,6 @@ module.exports = function(sequelize, DataTypes) {
 			type: DataTypes.TEXT,
 			allowNull: true
 		},
-		/* boolean operation that is required to use object (as a string) */
-		key: {
-			type: DataTypes.TEXT,
-			allowNull: false,
-			defaultValue: "true"
-		},
 		/* what you see if op fails */
 		failureMessage: {
 			type: DataTypes.TEXT,
@@ -64,6 +58,17 @@ module.exports = function(sequelize, DataTypes) {
 
 				// owner who controls this object
 				MUDObject.belongsTo(MUDObject, {foreignKey: 'ownerId', as: 'owner'});
+
+				// key required to use this object
+				MUDObject.belongsTo(MUDObject, {foreignKey: 'keyId', as: 'key'});
+			}
+		},
+		instanceMethods: {
+			canLink: function() {
+				return this.flags & 0x01;
+			},
+			hasAntiLock: function() {
+				return this.flags & 0x02;
 			}
 		}
 	});

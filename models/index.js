@@ -9,20 +9,30 @@ if (!global.hasOwnProperty('db')) {
   var Sequelize = require('sequelize');
   var sequelize = null;
 
-  //choose database based on environment -- edit to suit your heroku and development databases
-  var dbUrl = process.env.HEROKU_POSTGRESQL_GREEN_URL || "postgres://jsh2:@localhost:5432/comp3207";
+  //edit to suit your heroku database
+  var dbUrl = process.env.HEROKU_POSTGRESQL_GREEN_URL;
   
-  //parse the url
-  var match = dbUrl.match(/postgres:\/\/([^:]+):([^@]*)@([^:]+):(\d+)\/(.+)/);
+  if (dbUrl) {
+    //if the heroku database is set, it will be used
 
-  // construct the sequelize object
-  sequelize = new Sequelize(match[5], match[1], match[2], {
-    dialect:  'postgres',
-    protocol: 'postgres',
-    port:     match[4],
-    host:     match[3],
-    logging:  console.log
-  });
+    //parse the url
+    var match = dbUrl.match(/postgres:\/\/([^:]+):([^@]*)@([^:]+):(\d+)\/(.+)/);
+
+    // construct the sequelize object
+    sequelize = new Sequelize(match[5], match[1], match[2], {
+      dialect:  'postgres',
+      protocol: 'postgres',
+      port:     match[4],
+      host:     match[3],
+      logging:  console.log
+    });
+  } else {
+    //otherwise we'll just use SQLite (which doesn't require any setup :))
+    sequelize = new Sequelize('database', 'username', 'password', {
+      dialect: 'sqlite',
+      storage: './dev-database.sqlite'
+    });
+  }
   
   //define the database
   global.db = {

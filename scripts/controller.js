@@ -1,7 +1,6 @@
 var S = require('string');
 var strings = require('./strings');
 var db = require('../models');
-var commands = require('./commands');
 
 /**
  * (private)
@@ -192,7 +191,34 @@ var controller = {
 		});
 
 		//initialise the command handler
-		commands = commands(controller);
+		commands = require('./commands');
+	},
+	createMUDObject: function(conn, obj, cb) {
+		db.MUDObject.build(obj).save().complete(function(err, nobj) {
+			if (!!err) {
+				fatalError(err, conn);
+			} else {
+				cb(nobj);
+			}
+		});
+	},
+	loadMUDObject: function(conn, obj, cb) {
+		db.MUDObject.find({ where : obj }).complete(function(err, dbo) {
+			if (!!err) {
+				fatalError(err, conn);
+			} else {
+				cb(dbo);
+			}
+		});
+	},
+	loadMUDObjects: function(conn, obj, cb) {
+		db.MUDObject.findAll({ where : obj }).complete(function(err, dbo) {
+			if (!!err) {
+				fatalError(err, conn);
+			} else {
+				cb(dbo);
+			}
+		});
 	}
 };
 
@@ -240,3 +266,11 @@ function getArgs(argsStr, nargs) {
 	return argsArr;
 }
 
+function fatalError(err, conn) {
+	if (conn) {
+		conn.send("A fatal error occurred: " + err + "\n");
+		conn.send("You will be disconnected immediately!\n");
+		conn.terminate();
+ 	}
+	throw {name: "FatalError", description: err};
+}
