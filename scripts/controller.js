@@ -1,6 +1,7 @@
 var S = require('string');
 var strings = require('./strings');
 var db = require('../models');
+var sequelize_fixtures = require('sequelize-fixtures');
 
 /**
  * (private)
@@ -46,8 +47,10 @@ var controller = {
 					}
 				}
 			} else {
-				if (isLoggedIn) 
-					controller.sendMessage(conn, strings.unknownCommand);
+				if (isLoggedIn) {
+					//delegate to the go command
+					commands.go.perform(conn, [message], strings.unknownCommand);
+				}
 				else
 					controller.splashScreen(conn);
 			}
@@ -61,7 +64,8 @@ var controller = {
 		activePlayers.push({ player: player, conn: conn });
 	},
 	deactivatePlayer: function(conn) {
-		controller.broadcastExcept(conn, strings.hasDisconnected);
+		var player = controller.findActivePlayerByConnection(conn);
+		controller.broadcastExcept(conn, strings.hasDisconnected, player);
 
 		for (var i=0; i<activePlayers.length; i++) {
 			if (activePlayers[i].conn === conn) {
@@ -97,6 +101,22 @@ var controller = {
 					controller.sendMessage(apconn, message, values);
 			}
 		);
+	},
+	/**
+ 	 * Send a message to all active players in the same room as the player represented by `conn` (excluding that player).
+ 	 * @param conn [ws.WebSocket] the connection belonging to the player whose location we're interested in
+	 * @param message [String] (optional) the message to send (sends a newline if undefined). 
+	 *				  The message can contain Mustache compatible `{{...}}` templates.
+	 * @param values [Object] (optional) the replacement strings to insert into the template
+ 	 */
+	sendMessageRoomExcept: function(conn, message, values) {
+		var player = controller.findActivePlayerByConnection(conn);
+		
+		controller.applyToActivePlayers(function(otherconn, other) {
+			if (other.locationId === player.locationId && player !== other) {
+				controller.sendMessage(otherconn, message, values);
+			}
+		});
 	},
 	/**
 	 * Sends a message to a connection (note that a newline is automatically added)
@@ -173,19 +193,12 @@ var controller = {
 	 */
 	init: function() {
 		//setup the default location
-		db.MUDObject.find({type: 'ROOM'}).complete(function(err, room) {
-			if (!!err)
-				throw {name: "FatalError", description: err};
-
+		controller.loadMUDObject(undefined, {id: 1}, function(room) {
 			if (room) {
 				controller.defaultRoom = room;
 			} else {
-				db.MUDObject.build({ type: 'ROOM', name: strings.defaultRoomName, description:  strings.defaultRoomDescription }).save().complete(function(err, room) {
-					if (!!err) {
-						throw {name: "FatalError", description: err};
-					} else {
-						controller.defaultRoom = room;
-					}
+				sequelize_fixtures.loadFile('data/small.json', {MUDObject: db.MUDObject}, function() {
+					controller.init();
 				});
 			}
 		});
@@ -219,6 +232,60 @@ var controller = {
 				cb(dbo);
 			}
 		});
+	},
+	findPotentialMUDObjects: function(conn, name, cb, allowMe, allowHere, type) {
+		var player = controller.findActivePlayerByConnection(conn);
+
+		if (allowMe && name === 'me') {
+			cb([player]);
+			return;
+		}
+
+		if (allowHere && name === 'here') {
+			player.getLocation().success(function(obj) {
+				cb([obj]);
+			});
+			return;
+		}
+
+		if (type) {
+			controller.loadMUDObjects(conn, 
+				db.Sequelize.and(
+					{name: {like: '%' + name + '%'}},
+					{'type': type},
+					db.Sequelize.or(
+						{locationId: player.locationId},
+						{locationId: player.id}
+					)
+				), function(objs){ cb(filterPossible(objs, name)); }
+			);
+		} else {
+			controller.loadMUDObjects(conn, 
+				db.Sequelize.and(
+					{name: {like: '%' + name + '%'}},
+					db.Sequelize.or(
+						{locationId: player.locationId},
+						{locationId: player.id}
+					)
+				), function(objs){ cb(filterPossible(objs, name)); }
+			);
+		}
+	},
+	findPotentialMUDObject: function(conn, name, cb, allowMe, allowHere, type, ambigMsg, failMsg) {
+		if (!ambigMsg) ambigMsg = strings.ambigSet;
+		if (!failMsg) failMsg = strings.dontSeeThat;
+
+		controller.findPotentialMUDObjects(conn, name, function(obj) {
+			if (obj && obj.length > 0) {
+				if (obj.length === 1) {
+					cb(obj[0]);
+				} else {
+					controller.sendMessage(conn, ambigMsg);
+				}
+			} else {
+				controller.sendMessage(conn, failMsg);
+			}
+		}, allowMe, allowHere, type);
 	}
 };
 
@@ -273,4 +340,28 @@ function fatalError(err, conn) {
 		conn.terminate();
  	}
 	throw {name: "FatalError", description: err};
+}
+
+function filterPossible(obj, name) {
+	if (obj && obj.length > 0) {
+		var farr = obj.filter(function(o) {
+			if (o.name === name) return true;
+			
+			var strs = o.name.split(/[ ;]+/g);
+
+			console.log(name);
+			console.log(strs);
+
+			if (strs.indexOf(name)>=0)
+				return true;
+
+			return false;
+		});
+
+		console.log(obj);
+		console.log(farr);
+
+		return farr;
+	}
+	return obj;
 }

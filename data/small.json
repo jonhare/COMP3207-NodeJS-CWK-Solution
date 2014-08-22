@@ -1,0 +1,43 @@
+[
+    {
+        "model": "MUDObject",
+        "data": {
+            "id": 1,
+            "name": "Limbo",
+            "description": "You are in a dense mist that seems to go on forever. If you drop an object here, or set its home to be here, you probably won't be able to find it again. For some strange reason, you can sense which way is north here.",
+            "locationId": null,
+            "MUDObjectContents": null,
+            "keyId": null,
+            "failureMessage": null,
+            "successMessage": null,
+            "othersFailureMessage": null,
+            "othersSuccessMessage": "is briefly visible through the mist.",
+            "ownerId": 2,
+            "pennies": 0,
+            "type": "ROOM",
+            "flags": 0,
+            "password": null
+        }
+    },
+    {
+        "model": "MUDObject",
+        "data": {
+            "id": 2,
+            "name": "Wizard",
+            "description": "You see a shabby old Wizard who appears to be asleep.",
+            "locationId": 1,
+            "targetId": 1,
+            "MUDObjectContents": null,
+            "keyId": null,
+            "failureMessage": null,
+            "successMessage": null,
+            "othersFailureMessage": null,
+            "othersSuccessMessage": "stole a penny from the Wizard.",
+            "ownerId": 1,
+            "pennies": 8,
+            "type": "PLAYER",
+            "flags": 0,
+            "password": "pw"
+        }
+    }
+]

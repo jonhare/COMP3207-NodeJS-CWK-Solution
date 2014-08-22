@@ -47,13 +47,10 @@ module.exports = function(sequelize, DataTypes) {
 	}, {
 		classMethods: {
 			associate: function(models) {
-	  			// Objects contained inside the object
-	  			MUDObject.hasMany(MUDObject, {as: 'contents', through: 'MUDObjectContents'});
+	  			//the target of the object (this is where exits go and things dropped in rooms go)
+				MUDObject.belongsTo(MUDObject, {foreignKey: 'targetId', as: 'target'});
 
-	  			// Exits to the object (0..many for rooms; 0..1 for people [home])
-				MUDObject.hasMany(MUDObject, {as: 'exits', through: 'MUDObjectExits'});
-
-				//the location of the object (or where it links to for exits)
+				//the location of the object
 				MUDObject.belongsTo(MUDObject, {foreignKey: 'locationId', as: 'location'});
 
 				// owner who controls this object
@@ -69,6 +66,9 @@ module.exports = function(sequelize, DataTypes) {
 			},
 			hasAntiLock: function() {
 				return this.flags & 0x02;
+			},
+			getContents: function() {
+				return db.MUDObject.findAll({ where : {locationId: this.id}});
 			}
 		}
 	});

@@ -54,30 +54,8 @@ function updatePropertyInternal(conn, targets, propertyName, value) {
 }
 
 function updateProperty(conn, targetName, propertyName, value) {
-	var me = controller.findActivePlayerByConnection(conn);
-
-	if (targetName === 'me') {
-		updatePropertyInternal(conn, me, propertyName, value);
-	} else if (targetName === 'here') {
-		me.getLocation().success(function(loc) {
-			updatePropertyInternal(conn, loc, propertyName, value);
-		});
-	} else {
-		controller.loadMUDObjects(conn, {name: {like: '%' + targetName + '%'}, locationId: me.locationId, type: {not: 'EXIT'}}, function(objs) {
-			if (objs && objs.length>0) {
-				updatePropertyInternal(conn, objs, propertyName, value);
-			} else {
-				me.getLocation().success(function(loc) {
-					loc.getExits({where: {name: {like: '%' + targetName + '%'}}}).success(function(exits) {
-						if (exits && exits.length>0) {
-							updatePropertyInternal(conn, exits, propertyName, value);
-						} else {
-							controller.sendMessage(conn, strings.setUnknown, {property: strings[propertyName]});
-						}
-					});
-				});
-			}
-		});
-	}
+	controller.findPotentialMUDObjects(conn, targetName, function(objs) {
+		updatePropertyInternal(conn, objs, propertyName, value);
+	}, true, true);
 }
 

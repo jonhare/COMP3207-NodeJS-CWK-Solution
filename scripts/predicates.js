@@ -31,6 +31,11 @@ module.exports = {
 		if (room.ownerId === player.id) return true;
 		return room.canLink();
 	},
+	canSee: function(player, thing) {
+		if (thing.type === 'EXIT' || thing.id === player.id) 
+			return false;
+		return true;
+	},
 	canDoIt: function(controller, player, thing, callback, defaultFailureMessage) {
 		var playerConn = controller.findActiveConnectionByPlayer(player);
 		
@@ -47,16 +52,16 @@ module.exports = {
 					controller.sendMessage(playerConn, defaultFailureMessage);
 				}
 
-				if (thing.otherFailureMessage) {
-					controller.sendMessageExcept(playerConn, player.name + " " + thing.otherSuccessMessage);
+				if (thing.othersFailureMessage) {
+					controller.sendMessageRoomExcept(playerConn, player.name + " " + thing.othersFailureMessage);
 				}
 			} else {
 				if (thing.successMessage) {
 					controller.sendMessage(playerConn, thing.successMessage);
 				}
 
-				if (thing.otherSuccessMessage) {
-					controller.sendMessageExcept(playerConn, player.name + " " + thing.otherSuccessMessage);
+				if (thing.othersSuccessMessage) {
+					controller.sendMessageRoomExcept(playerConn, player.name + " " + thing.othersSuccessMessage);
 				}
 			}
 
