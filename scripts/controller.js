@@ -1,3 +1,11 @@
+/**
+ * scripts/controller.js
+ * 
+ * Main game controller: handles messages to/from players and 
+ * provides a number of general utility functions.
+ *
+ * @author Jonathon Hare (jsh2@ecs.soton.ac.uk)
+ */
 var S = require('string');
 var strings = require('./strings');
 var db = require('../models');
@@ -9,13 +17,40 @@ var sequelize_fixtures = require('sequelize-fixtures');
  */
 var activePlayers = Array();
 
+//The controller class (will be exported)
 var controller = {
 	/**
 	 * The default room for new players (set by #init()) [db.MUDObject].
 	 */
 	defaultRoom: undefined,
 	/**
-	 * Handle a message from a user at a given connection
+	 * Initialise the controller object and database state
+	 */
+	init: function() {
+		//setup the default location
+		controller.loadMUDObject(undefined, {id: 1}, function(room) {
+			if (room) {
+				controller.defaultRoom = room;
+			} else {
+				sequelize_fixtures.loadFile('data/small.json', {MUDObject: db.MUDObject}, function() {
+					controller.init();
+				});
+			}
+		});
+
+		//initialise the command handler
+		commands = require('./commands');
+	},
+	/**
+	 * Handle a message from a user at a given connection. Basically this looks for a valid
+	 * matching command in the commands object (which contains keyed CommandHandler instances) 
+	 * and calls the CommandHandler#validate method on that (which should then call the 
+	 * perform method if validation is successful). 
+	 *
+	 * Additionally this deals with validation of pre and post login commands (see 
+	 * CommandHandler#preLogin and CommandHandler#postLogin), and also the fallback 
+	 * of unknown commands to the `go` command.
+	 *
 	 * @param conn [ws.WebSocket] the connection
 	 * @param message [string] the message typed by the user
 	 */
@@ -60,9 +95,20 @@ var controller = {
 			console.log(e.name + ": " + e.message);
 		}
 	},
+	/**
+	 * Activate a player by adding them to the list of active players and connections
+	 * @param conn the connection
+	 * @param player the player
+	 */
 	activatePlayer: function(conn, player) {
 		activePlayers.push({ player: player, conn: conn });
 	},
+	/**
+	 * Deactivate a player by removing them from the list of active players and connections. 
+	 * Also sends a message to the other players saying they've left and terminates the
+	 * connection.
+	 * @param conn the connection of the player who is disconnecting
+	 */
 	deactivatePlayer: function(conn) {
 		var player = controller.findActivePlayerByConnection(conn);
 		controller.broadcastExcept(conn, strings.hasDisconnected, player);
@@ -76,6 +122,13 @@ var controller = {
 
 		conn.terminate();
 	},
+	/**
+	 * Apply the given function to all the active players.
+	 * @param operation the function to apply; takes two 
+	 * 		  parameters: (ws.WebSocket) connection and (db.MUDObject) player.
+	 *		  If the function returns false, then iteration through the players stops
+	 *		  at that point.
+	 */
 	applyToActivePlayers: function(operation) {
 		for (var i=0; i<activePlayers.length; i++) {
 			if (operation(activePlayers[i].conn, activePlayers[i].player) === false) {
@@ -104,10 +157,10 @@ var controller = {
 	},
 	/**
  	 * Send a message to all active players in the same room as the player represented by `conn` (excluding that player).
- 	 * @param conn [ws.WebSocket] the connection belonging to the player whose location we're interested in
-	 * @param message [String] (optional) the message to send (sends a newline if undefined). 
+ 	 * @param conn (ws.WebSocket) the connection belonging to the player whose location we're interested in
+	 * @param message (String) (optional) the message to send (sends a newline if undefined). 
 	 *				  The message can contain Mustache compatible `{{...}}` templates.
-	 * @param values [Object] (optional) the replacement strings to insert into the template
+	 * @param values (Object) (optional) the replacement strings to insert into the template
  	 */
 	sendMessageRoomExcept: function(conn, message, values) {
 		var player = controller.findActivePlayerByConnection(conn);
@@ -120,10 +173,10 @@ var controller = {
 	},
 	/**
 	 * Sends a message to a connection (note that a newline is automatically added)
-	 * @param conn [ws.WebSocket] the connection 
-	 * @param message [String] (optional) the message to send (sends a newline if undefined). 
+	 * @param conn (ws.WebSocket) the connection 
+	 * @param message (String) (optional) the message to send (sends a newline if undefined). 
 	 *				  The message can contain Mustache compatible `{{...}}` templates.
-	 * @param values [Object] (optional) the replacement strings to insert into the template
+	 * @param values (Object) (optional) the replacement strings to insert into the template
 	 */
 	sendMessage: function(conn, message, values) {
 		message = message === undefined ? '' : message;
@@ -135,7 +188,7 @@ var controller = {
 	},
 	/**
 	 * Clear the screen of the player represented by the connection
-	 * @param conn [ws.WebSocket] the connection 
+	 * @param conn (ws.WebSocket) the connection 
 	 */
 	clearScreen: function(conn) {
 		for (var i=0; i<24; i++) {
@@ -144,7 +197,7 @@ var controller = {
 	},
 	/**
 	 * Display the splash screen and connection prompt
-	 * @param conn [ws.WebSocket] the connection 
+	 * @param conn (ws.WebSocket) the connection 
 	 */
 	splashScreen: function(conn) {
 		controller.sendMessage(conn, strings.loginPrompt);
@@ -152,7 +205,7 @@ var controller = {
 	/**
 	 * Find the active player with the given name
 	 * @param name the player name
-	 * @return [db.MUDObject] the player or undefined if not found
+	 * @return (db.MUDObject) the player or undefined if not found
 	 */
 	findActivePlayerByName: function(name) {
 		for (var i=0; i<activePlayers.length; i++) {
@@ -164,8 +217,8 @@ var controller = {
 	},
 	/**
 	 * Find the active player with the given connection
-	 * @param conn [ws.WebSocket] the connection 
-	 * @return [db.MUDObject] the player or undefined if not found
+	 * @param conn (ws.WebSocket) the connection 
+	 * @return (db.MUDObject) the player or undefined if not found
 	 */
 	findActivePlayerByConnection: function(conn) {
 		for (var i=0; i<activePlayers.length; i++) {
@@ -177,8 +230,8 @@ var controller = {
 	},
 	/**
 	 * Find the connection for the given player
-	 * @param player [db.MUDObject] the player
-	 * @return [ws.WebSocket] the connection or undefined if the player is not connected
+	 * @param player (db.MUDObject) the player
+	 * @return (ws.WebSocket) the connection or undefined if the player is not connected
 	 */
 	findActiveConnectionByPlayer: function(player) {
 		for (var i=0; i<activePlayers.length; i++) {
@@ -189,23 +242,12 @@ var controller = {
 		return undefined;
 	},
 	/**
-	 * Initialise the controller object and database state
+	 * Create a new database object from the given parameters. Handles errors automatically.
+	 * @param conn (ws.WebSocket) the player's connection (can be `undefined`).
+	 * @param obj (object) Object with properties mirroring the new database object
+	 * @param cb (function) Callback function to call on completion of the database write. 
+	 *				Takes a single parameter of the (db.MUDObject) that was created.
 	 */
-	init: function() {
-		//setup the default location
-		controller.loadMUDObject(undefined, {id: 1}, function(room) {
-			if (room) {
-				controller.defaultRoom = room;
-			} else {
-				sequelize_fixtures.loadFile('data/small.json', {MUDObject: db.MUDObject}, function() {
-					controller.init();
-				});
-			}
-		});
-
-		//initialise the command handler
-		commands = require('./commands');
-	},
 	createMUDObject: function(conn, obj, cb) {
 		db.MUDObject.build(obj).save().complete(function(err, nobj) {
 			if (!!err) {
@@ -215,6 +257,13 @@ var controller = {
 			}
 		});
 	},
+	/**
+	 * Load a database object from the given parameters. Handles errors automatically.
+	 * @param conn (ws.WebSocket) the player's connection (can be `undefined`).
+	 * @param obj (object) Object with properties mirroring the database object you want to find.
+	 * @param cb (function) Callback function to call on completion of the database read. 
+	 *				Takes a single parameter of the (db.MUDObject) that was read.
+	 */
 	loadMUDObject: function(conn, obj, cb) {
 		db.MUDObject.find({ where : obj }).complete(function(err, dbo) {
 			if (!!err) {
@@ -224,6 +273,13 @@ var controller = {
 			}
 		});
 	},
+	/**
+	 * Load database objects from the given parameters. Handles errors automatically.
+	 * @param conn (ws.WebSocket) the player's connection (can be `undefined`).
+	 * @param obj (object) Object with properties mirroring the database object(s) you want to find.
+	 * @param cb (function) Callback function to call on completion of the database read. 
+	 *				Takes a single parameter of the array of [db.MUDObject]s that was read.
+	 */
 	loadMUDObjects: function(conn, obj, cb) {
 		db.MUDObject.findAll({ where : obj }).complete(function(err, dbo) {
 			if (!!err) {
@@ -233,6 +289,23 @@ var controller = {
 			}
 		});
 	},
+	/**
+	 * Find database objects from the given name that are likely to be relevant 
+	 * to the player (specified by the connection). Handles errors automatically.
+	 *
+	 * Specifically looks for partial matches of the given name in objects that the player
+	 * is carrying or that are in the room the player is in. The name can optionally be "me" 
+	 * or "here" to refer to the player or their location. Additionally, the type of object
+	 * being searched can be restricted.
+	 * 
+	 * @param conn (ws.WebSocket) the player's connection.
+	 * @param name (string) the (partial) name of the object(s) in question
+	 * @param cb (function) Callback function to call on completion of the database read. 
+	 *				Takes a single parameter of the array of [db.MUDObject]s that was found.
+	 * @param allowMe (boolean) whether to handle "me" as a name
+	 * @param allowHere (boolean) whether to handle "here" as a name
+	 * @param type (db.MUDObject.type) type of objects to find
+	 */
 	findPotentialMUDObjects: function(conn, name, cb, allowMe, allowHere, type) {
 		var player = controller.findActivePlayerByConnection(conn);
 
@@ -271,6 +344,31 @@ var controller = {
 			);
 		}
 	},
+	/**
+	 * Find a database object from the given name that is likely to be relevant 
+	 * to the player (specified by the connection). Handles errors automatically.
+	 *
+	 * Specifically looks for partial matches of the given name in objects that the player
+	 * is carrying or that are in the room the player is in. The name can optionally be "me" 
+	 * or "here" to refer to the player or their location. Additionally, the type of object
+	 * being searched can be restricted.
+	 *
+	 * If more than one object matches the name, then the player can be alerted that the query 
+	 * was ambiguous and the callback will not be called.
+	 *
+	 * If more than zero objects match the name, then the player can be alerted that the query 
+	 * failed and the callback will not be called.
+	 * 
+	 * @param conn (ws.WebSocket) the player's connection.
+	 * @param name (string) the (partial) name of the object(s) in question
+	 * @param cb (function) Callback function to call on completion of the database read. 
+	 *				Takes a single parameter of the array of [db.MUDObject]s that was found.
+	 * @param allowMe (boolean) whether to handle "me" as a name
+	 * @param allowHere (boolean) whether to handle "here" as a name
+	 * @param type (db.MUDObject.type) type of objects to find (can be `undefined`)
+	 * @param ambigMsg message to show to the player if the query was ambiguous
+	 * @param failMsg message to show to the player if the query fails to find anything
+	 */
 	findPotentialMUDObject: function(conn, name, cb, allowMe, allowHere, type, ambigMsg, failMsg) {
 		if (!ambigMsg) ambigMsg = strings.ambigSet;
 		if (!failMsg) failMsg = strings.dontSeeThat;
@@ -289,6 +387,7 @@ var controller = {
 	}
 };
 
+//Export the controller
 module.exports = controller;
 
 //Private helper functions below this point
@@ -299,8 +398,8 @@ module.exports = controller;
  * could contain spaces depending on the number of spaces and `nargs`.
  * Leading and trailing whitespace is trimmed from all arguments.
  *
- * @param argsStr [string] the arguments string
- * @param nargs [number] number of expected arguments
+ * @param argsStr (string) the arguments string
+ * @param nargs (number) number of expected arguments
  * @return the arguments array
  */
 function getArgs(argsStr, nargs) {
@@ -333,6 +432,10 @@ function getArgs(argsStr, nargs) {
 	return argsArr;
 }
 
+/**
+ * Function for handling fatal errors. The player is told there was a 
+ * problem and they are disconnected before an exception is thrown.
+ */
 function fatalError(err, conn) {
 	if (conn) {
 		conn.send("A fatal error occurred: " + err + "\n");
@@ -342,6 +445,10 @@ function fatalError(err, conn) {
 	throw {name: "FatalError", description: err};
 }
 
+/**
+ * Helper function for filtering objects matching a name beyond what is
+ * (easily) accomplishable with Sequelize queries.
+ */
 function filterPossible(obj, name) {
 	if (obj && obj.length > 0) {
 		var farr = obj.filter(function(o) {
@@ -349,17 +456,11 @@ function filterPossible(obj, name) {
 			
 			var strs = o.name.split(/[ ;]+/g);
 
-			console.log(name);
-			console.log(strs);
-
 			if (strs.indexOf(name)>=0)
 				return true;
 
 			return false;
 		});
-
-		console.log(obj);
-		console.log(farr);
 
 		return farr;
 	}

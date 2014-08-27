@@ -183,9 +183,15 @@ var commands = {
 
 					player.getContents().success(function(contents){
 						if (contents) {
+							var chainer = new db.Sequelize.Utils.QueryChainer;
 							for (var i=0; i<contents.length; i++) {
-								//TODO: do drop
+								var ci = contents[i];
+								ci.locationId = ci.targetId;
+								chainer.add(ci.save());
 							}
+							chainer.run().success(function(){
+								//don't need to do anything
+							});
 						}
 
 						controller.sendMessage(conn, "There's no place like home...");
@@ -202,17 +208,25 @@ var commands = {
 				controller.findPotentialMUDObject(conn, exitName, function(exit) {
 					//found a matching exit... can we use it?
 					predicates.canDoIt(controller, player, exit, function(canDoIt) {
-						if (canDoIt) {
+						if (canDoIt && exit.targetId) {
 							exit.getTarget().success(function(loc) {
-								controller.applyToActivePlayers(function(otherconn, other) {
-									if (other.locationId === loc.id && player !== other) {
-										controller.sendMessage(otherconn, strings.enters, {name: player.name});
-									}
-								});
-
-								player.setLocation(loc).success(function() {
+								if (loc.id !== player.locationId) {
+									//only inform everyone else if its a different room
+									controller.applyToActivePlayers(function(otherconn, other) {
+										if (other.locationId === player.locationId && player !== other) {
+											controller.sendMessage(otherconn, strings.leaves, {name: player.name});
+										}
+										if (other.locationId === loc.id && player !== other) {
+											controller.sendMessage(otherconn, strings.enters, {name: player.name});
+										}
+									});
+								
+									player.setLocation(loc).success(function() {
+										commands.look.lookRoom(conn, loc);
+									});
+								} else {
 									commands.look.lookRoom(conn, loc);
-								});
+								}
 							});
 						}
 					}, strings.noGo);
@@ -273,7 +287,6 @@ var commands = {
 		},
 		lookContents: function(conn, obj, name) {
 			obj.getContents().success(function(contents) {
-				console.log(contents);
 				if (contents) {
 					var player = controller.findActivePlayerByConnection(conn);
 
@@ -289,6 +302,12 @@ var commands = {
 					}
 				} 
 			});
+		}
+	}),
+	inventory: CommandHandler.extend({
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+			commands.look.lookContents(conn, player, 'Carrying:');
 		}
 	}),
 	"@dig": PropertyHandler.extend({
@@ -325,6 +344,29 @@ var commands = {
 	"@name": PropertyHandler.extend({
 		prop: 'name'
 	}),
+	"@password": PropertyHandler.extend({
+		prop: 'name',
+		validate: function(conn, argsArr, cb) {
+			if (argsArr.length === 1 && argsArr[0].indexOf('=')>0)
+				cb.apply(this, [conn, argsArr]);
+			else
+				controller.sendMessage(conn, strings.unknownCommand);
+		},
+		perform: function(conn, argsArr) {
+			var index = argsArr[0].indexOf("=");
+			var oldPass = argsArr[0].substring(0, index).trim();
+			var newPass = argsArr[0].substring(index + 1).trim();
+			var player = controller.findActivePlayerByConnection(conn);
+
+			if (oldPass === player.password && predicates.isPasswordValid(newPass)) {
+				player.setPassword(newPass).success(function() {
+					controller.sendMessage(conn, strings.changePasswordSuccess);
+				});
+			} else {
+				controller.sendMessage(conn, strings.changePasswordFail);
+			}
+		}
+	}),
 	"@open": CommandHandler.extend({
 		nargs: 1,
 		validate: function(conn, argsArr, cb) {
@@ -344,11 +386,9 @@ var commands = {
 
 			player.getLocation().success(function(loc) {
 				if (loc.ownerId === player.id) {
-					controller.createMUDObject(conn, {name: exitName, type: 'EXIT', locationId: loc.id}, function(exit) {
-							loc.addContent(exit).success(function() {
-								controller.sendMessage(conn, "Opened.");
-							});
-						});
+					controller.createMUDObject(conn, {name: exitName, type: 'EXIT', locationId: loc.id, ownerId: player.id}, function(exit) {
+						controller.sendMessage(conn, "Opened.");
+					});
 				} else {
 					controller.sendMessage(conn, strings.permissionDenied);
 				}
@@ -370,12 +410,10 @@ var commands = {
 				controller.loadMUDObject(conn, {id: value, type: 'ROOM'}, function(room) {
 					if (room) {
 						switch(obj.type) {
-						case 'ROOM':
-							commands['@link'].setDropto(conn, obj, room);
-							break;
 						case 'EXIT':
 							commands['@link'].linkExit(conn, obj, room);
 							break;
+						case 'ROOM':
 						case 'PLAYER':
 						case 'THING':
 							commands['@link'].setHome(conn, obj, room);
@@ -414,9 +452,6 @@ var commands = {
 				}
 			}
 		},
-		setDropto: function(conn, obj, room) {
-			controller.sendMessage(conn, "not implemented");
-		}
 	}),
 	"@unlink": PropertyHandler.extend({
 		perform: function(conn, argsArr) {
@@ -424,7 +459,7 @@ var commands = {
 
 			controller.findPotentialMUDObject(conn, argsArr[0], function(obj) {
 				if (obj.ownerId === player.id) {
-					exits[0].setLocation(null).success(function() {
+					obj.setLocation(null).success(function() {
 						controller.sendMessage(conn, strings.unlinked);
 					});
 				} else {
@@ -433,11 +468,232 @@ var commands = {
 			}, false, false, 'EXIT', strings.ambigSet, strings.unlinkUnknown);
 		}
 	}),
-	// "@unlock": PropertyHandler.extend({
-	// 	perform: function(conn, argsArr) {
+	"@create": CommandHandler.extend({
+		nargs: 1,
+		validate: function(conn, argsArr, cb) {
+			if (argsArr.length === 1) {
+				if (predicates.isNameValid(argsArr[0])) {
+					cb(conn, argsArr);
+				} else {
+					controller.sendMessage(conn, strings.invalidName);	
+				}
+			} else {
+				controller.sendMessage(conn, strings.unknownCommand);
+			}
+		},
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+			var objectName = argsArr[0];
+
+			controller.createMUDObject(conn, {name: objectName, type: 'THING', locationId: player.id, targetId: player.targetId, ownerId: player.id}, function(thing) {
+				controller.sendMessage(conn, "Created.");
+			});
+		}
+	}),
+	"@unlock": PropertyHandler.extend({
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+
+			controller.findPotentialMUDObject(conn, argsArr[0], function(obj) {
+				if (obj.ownerId === player.id) {
+					obj.setKey(null).success(function() {
+						controller.sendMessage(conn, strings.unlocked);
+					});
+				} else {
+					controller.sendMessage(conn, strings.permissionDenied);
+				}
+			}, true, true, undefined, strings.ambigSet, strings.unlockUnknown);
+		}
+	}),
+	"@lock": PropertyHandler.extend({
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+
+			var index = argsArr[0].indexOf("=");
+			var targetName = argsArr[0].substring(0, index).trim();
+			var value = argsArr[0].substring(index + 1).trim();
+
+			controller.findPotentialMUDObject(conn, targetName, function(obj) {
+				if (obj.ownerId === player.id) {
+					controller.findPotentialMUDObject(conn, value, function(key) {
+						obj.setKey(key).success(function() {
+							controller.sendMessage(conn, strings.locked);
+						});
+					}, true, true, undefined, strings.ambigSet, strings.keyUnknown);
+				} else {
+					controller.sendMessage(conn, strings.permissionDenied);
+				}
+			}, true, true, undefined, strings.ambigSet, strings.lockUnknown);
+		}
+	}),
+	"examine": CommandHandler.extend({
+		nargs: 1,
+		validate: function(conn, argsArr, cb) {
+			cb(conn, argsArr);
+		},
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+			var targetName;
+
+			if (argsArr && argsArr.length === 1 && argsArr[0].length>0)
+				targetName = argsArr[0];
+			else
+				targetName = 'here';
+
+			controller.findPotentialMUDObject(conn, targetName, function(obj) {
+				if (obj.ownerId === player.id) {
+					controller.sendMessage(conn, strings.examine, obj);
+
+					obj.getContents().success(function(contents) {
+						if (contents && contents.length > 0) {
+							controller.sendMessage(conn, strings.examineContents);
+							for (var i=0; i<contents.length; i++) {
+								controller.sendMessage(conn, strings.examineContentsName, contents[i]);
+							}
+						}	
+					});
+				} else {
+					controller.sendMessage(conn, strings.permissionDenied);
+				}
+			}, true, true, undefined, strings.ambigSet, strings.examineUnknown);
+		}
+	}),
+	take: PropertyHandler.extend({
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+			var targetName = argsArr[0];
 			
-	// 	}
-	// }),
+			controller.findPotentialMUDObject(conn, targetName, function(obj) {
+				switch (obj.type) {
+					case 'PLAYER':
+						controller.sendMessage(conn, strings.cantTakeThat);
+						return;
+					case 'EXIT':
+						if (obj.targetId !== null) {
+							controller.sendMessage(conn, strings.cantTakeLinkedExit);
+							return;
+						}
+					case 'ROOM':
+						return; //*should* never be able to get here!!
+				}
+
+				if (obj.locationId === player.id) {
+					controller.sendMessage(conn, strings.alreadyHaveThat);
+				} else {
+					predicates.canDoIt(controller, player, obj, function(canDoIt) {
+						if (canDoIt) {
+							obj.setLocation(player).success(function () {
+								controller.sendMessage(conn, strings.taken);
+							});
+						}
+					}, strings.cantTakeThat);
+				}
+			}, false, false, undefined, strings.ambigSet, strings.takeUnknown);
+		}
+	}),
+	"drop": PropertyHandler.extend({
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+			var targetName = argsArr[0];
+			
+			controller.findPotentialMUDObjects(conn, targetName, function(objs) {
+				var fobjs = objs.filter(function(obj) {
+					return obj.locationId === player.id;
+				});
+
+				if (fobjs.length === 0) {
+					controller.sendMessage(conn, strings.dontHave);
+				} else {
+					var obj = fobjs[0];
+
+					player.getLocation().success(function(loc) {
+						if (loc.targetId === null) {
+							obj.setLocation(loc).success(function() {
+								controller.sendMessage(conn, strings.dropped);
+							});
+						} else if (loc.isTemple()) {
+							//obj goes to its home
+							obj.getTarget().success(function(tgt) {
+								obj.setLocation(tgt).success(function() {
+									controller.sendMessage(conn, strings.dropped);
+								});
+							});
+						} else {
+							//obj goes to loc.target
+							loc.getTarget().success(function(tgt) {
+								obj.setLocation(tgt).success(function() {
+									controller.sendMessage(conn, strings.dropped);
+								});
+							});
+						}
+					});
+				}
+				
+			}, false, false, undefined, strings.ambigSet, strings.takeUnknown);
+		}
+	}),
+	"@set": PropertyHandler.extend({
+		validate: function(conn, argsArr, cb) {
+			if (argsArr.length === 1 && argsArr[0].indexOf('=')>0) {
+				var index = argsArr[0].indexOf("=");
+				var value = argsArr[0].substring(index + 1).trim();
+				if (value.indexOf('!')===0)
+					value = value.substring(1);
+
+				if (db.MUDObject.FLAGS[value]) {
+					cb.apply(this, [conn, argsArr]);
+					return;
+				}
+			}
+			
+			controller.sendMessage(conn, strings.unknownCommand);
+		},
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+
+			var index = argsArr[0].indexOf("=");
+			var targetName = argsArr[0].substring(0, index).trim();
+			var value = argsArr[0].substring(index + 1).trim();
+			var isReset = value.indexOf('!')===0;
+
+			if (isReset)
+				value = value.substring(1);
+
+			var flag = db.MUDObject.FLAGS[value];
+
+			controller.findPotentialMUDObject(conn, targetName, function(obj) {
+				if (obj.ownerId === player.id) {
+					if (isReset) {
+						obj.resetFlag(flag).success(function() {
+							controller.sendMessage(conn, strings.reset, {property: value});
+						});
+					} else {
+						obj.setFlag(flag).success(function() {
+							controller.sendMessage(conn, strings.set, {property: value});
+						});
+					}
+				} else {
+					controller.sendMessage(conn, strings.permissionDenied);
+				}
+			}, true, true, undefined, strings.ambigSet, strings.setUnknown);
+		}
+	}),
+	page: PropertyHandler.extend({
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+			var other = controller.findActivePlayerByName(argsArr[0]);
+			var otherconn = controller.findActiveConnectionByPlayer(other);
+
+			if (other) {
+				player.getLocation().success(function(loc) {
+					controller.sendMessage(otherconn, strings.page, {name: player.name, location: loc.name});
+					controller.sendMessage(conn, strings.pageOK);
+				});
+			} else {
+				controller.sendMessage(conn, strings.isNotAvailable);
+			}
+		}
+	})
 };
 
 //command aliases
@@ -447,6 +703,8 @@ commands.cr = commands.create;
 commands.co = commands.connect;
 commands.fail = commands.failure;
 commands.ofail = commands.ofailure;
+commands.read = commands.look;
+commands.get = commands.take;
 
 module.exports = commands;
 

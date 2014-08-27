@@ -33,7 +33,7 @@
             "successMessage": null,
             "othersFailureMessage": null,
             "othersSuccessMessage": "stole a penny from the Wizard.",
-            "ownerId": 1,
+            "ownerId": 2,
             "pennies": 8,
             "type": "PLAYER",
             "flags": 0,

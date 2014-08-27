@@ -1,3 +1,12 @@
+/**
+ * models/mudobject.js
+ * 
+ * Sequelize database table/object definition for a `MUDObject`.
+ * Every thing in the game (players, rooms, exits and things)
+ * is an instance of a MUDObject.
+ * 
+ * @author Jonathon Hare (jsh2@ecs.soton.ac.uk)
+ */
 module.exports = function(sequelize, DataTypes) {
 	var MUDObject = sequelize.define("MUDObject", {
 		/* Name of the object */
@@ -10,12 +19,12 @@ module.exports = function(sequelize, DataTypes) {
 			type: DataTypes.TEXT,
 			allowNull: true
 		},
-		/* what you see if op fails */
+		/* what player sees if op fails */
 		failureMessage: {
 			type: DataTypes.TEXT,
 			allowNull: true
 		},
-		/* what you see if op succeeds */
+		/* what player sees if op succeeds */
 		successMessage: {
 			type: DataTypes.TEXT,
 			allowNull: true
@@ -30,14 +39,13 @@ module.exports = function(sequelize, DataTypes) {
 			type: DataTypes.TEXT,
 			allowNull: true
 		},
-		/* number of pennies object contains */
-		pennies: DataTypes.INTEGER,
+		/* type of MUDObject */
 		type: {
 			type: DataTypes.ENUM,
 			values: ['ROOM', 'THING', 'EXIT', 'PLAYER'],
 			allowNull: false
 		},
-		/* bitflags defining the type of the object and its attributes */
+		/* bitflags defining the attributes of the object */
 		flags: DataTypes.INTEGER,
 		/* Password (only for people) */
 		password: {
@@ -58,17 +66,39 @@ module.exports = function(sequelize, DataTypes) {
 
 				// key required to use this object
 				MUDObject.belongsTo(MUDObject, {foreignKey: 'keyId', as: 'key'});
-			}
+			},
+			FLAGS: {
+				link_ok: 1<<0,
+				anti_lock: 1<<1,
+				temple: 1<<2
+			},
 		},
 		instanceMethods: {
+			getFlag: function(flag) {
+				return this.flags & db.MUDObject.FLAGS[flag];
+			},
 			canLink: function() {
-				return this.flags & 0x01;
+				return this.flags & db.MUDObject.FLAGS.link_ok;
 			},
 			hasAntiLock: function() {
-				return this.flags & 0x02;
+				return this.flags & db.MUDObject.FLAGS.anti_lock;
+			},
+			isTemple: function() {
+				return this.flags & db.MUDObject.FLAGS.temple;
 			},
 			getContents: function() {
 				return db.MUDObject.findAll({ where : {locationId: this.id}});
+			},
+			setFlag: function(flagbit) {
+				console.log("Old " + this.flags);
+				this.flags |= flagbit;
+				console.log("Set " + this.flags);
+				return this.save();
+			},
+			resetFlag: function(flagbit) {
+				this.flags &= ~flagbit;
+
+				return this.save();
 			}
 		}
 	});

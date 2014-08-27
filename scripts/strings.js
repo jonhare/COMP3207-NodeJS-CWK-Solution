@@ -56,7 +56,6 @@ module.exports = {
 	ambigGo: 			"I don't know which way you mean!",
 	ambigSet: 			"I don't know which one you mean!", 
 	nothingSpecial: 	"You see nothing special.",
-	setUnknown:  		"Set the {{property}} of what?",
 	permissionDenied: 	"Permission denied.",
 	unlinkUnknown: 		"Unlink what?",
 	unlinked:			"Unlinked.",
@@ -64,19 +63,50 @@ module.exports = {
 	homeSet: 			"Home set.", 
 	linked:				"Linked.",
 	exitBeingCarried: 	"That exit is being carried.",
-
-	set: 				"{{property}} set.", 
+	unlockUnknown: 		"Unlock what?",
+	unlocked:			"Unlocked.",
+	locked:				"Locked.",
+	leaves: 			"{{name}} has left.",
+	
+	set: 				"{{property}} set.",
+	reset: 				"{{property}} reset.",
+	setUnknown:  		"Set what?",
 	successMessage: 	"success message",
 	othersSuccessMessage: "others success message",
-	failureMessagekey:  "failure message",
+	failureMessage:  	"failure message",
 	othersFailureMessage: "others failure message",
 	description:  		"description",
 	name: 				"name",
 
-	// Default data for the first room
-	defaultRoomName: 	"Starting room",
-	defaultRoomDescription: "You are standing in a fabulous, "
-				+ "fabulous, exotic room, with all sorts of things that go 'hum' "
-				+ "and 'plink' in the night.\n\nAs you glance around the room, "
-				+ "you wonder what else might exist in this world.",
+	cantTakeThat: 		"You can't take that!",
+	cantTakeLinkedExit:	"You can only take unlinked exits.",
+	alreadyHaveThat: 	"You already have that.",
+	taken: 				"Taken.",
+	takeUnknown: 		"Take what?", 
+
+	examineContents: 	"Contents:",
+	examineContentsName:"\t{{type}} {{name}}",
+
+	examine: 			"{{name}} (#{{id}})\n" +
+						"Description: {{description}}\n" + 
+						"Failure message: {{failureMessage}}\n" + 
+						"Success message: {{successMessage}}\n" + 
+						"Others failure message: {{othersFailureMessage}}\n" +
+						"Others success message: {{othersSuccessMessage}}\n" +
+						"Type: {{type}}\n" +
+						"Flags: {{flags}}\n" + 
+						"Password: {{password}}\n" + 
+						"Target: {{targetId}}\n" +
+						"Location: {{locationId}}\n" +
+						"Owner: {{ownerId}}\n" + 
+						"Key: {{keyId}}\n",
+
+	isNotAvailable: 	"I don't recognize that name.",
+	page: 				"You sense that {{name}} is looking for you in {{location}}.", 
+	pageOK: 			"Your message has been sent.",
+
+	changePasswordFail: "Sorry.",
+	changePasswordSuccess: "Password changed.",
+	dontHave: 			"You don't have that.",
+	dropped: 			"Dropped.", 
 };
