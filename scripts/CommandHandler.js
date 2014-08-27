@@ -6,8 +6,8 @@
  * 
  * @author Jonathon Hare (jsh2@ecs.soton.ac.uk)
  */
-var controller = require('./controller');
-var strings = require('./strings');
+var controller = require('./Controller');
+var strings = require('./Strings');
 
 module.exports = {
 	/**
