@@ -42,7 +42,7 @@ var controller = {
 		});
 
 		//initialise the command handler
-		commands = require('./commands');
+		commands = require('./Commands');
 	},
 	/**
 	 * Handle a message from a user at a given connection. Basically this looks for a valid
