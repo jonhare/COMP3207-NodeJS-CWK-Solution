@@ -1,9 +1,10 @@
 
 
 var S = require('string');
-var strings = require('./strings');
+var strings = require('./Strings');
 var CommandHandler = require('./CommandHandler');
-var controller = require('./controller');
+var controller = require('./Controller');
+var predicates = require('./Predicates');
 
 var PropertyHandler = CommandHandler.extend({
 	prop: undefined,
@@ -16,7 +17,7 @@ var PropertyHandler = CommandHandler.extend({
 	},
 	perform: function(conn, argsArr) {
 		var index = argsArr[0].indexOf("=");
-		index = index==-1 ? argsArr[0].length : index;
+		index = (index === -1) ? argsArr[0].length : index;
 		var targetName = argsArr[0].substring(0, index).trim();
 		var value = argsArr[0].substring(index + 1).trim();
 
@@ -32,8 +33,8 @@ function updatePropertyInternal(conn, targets, propertyName, value) {
 	if (!Array.isArray(targets)) 
 		targets = [targets];
 
-	ftargets = targets.filter(function(obj) {
-		return obj.ownerId == me.id;
+	var ftargets = targets.filter(function(obj) {
+		return obj.ownerId === me.id;
 	});
 
 	if (ftargets.length === 0) {
@@ -42,15 +43,11 @@ function updatePropertyInternal(conn, targets, propertyName, value) {
 	} else if (ftargets.length>1 && predicates.sameName(ftargets)) {
 		controller.sendMessage(conn, strings.ambigSet);
 	} else {
-		var target = targets[0];
+		var target = ftargets[0];
 
 		target[propertyName] = value;
-		target.save().complete(function(err, obj) {
-			if (!!err) {
-				fatalError(err, conn);
-			} else {
-				controller.sendMessage(conn, strings.set, {property: S(strings[propertyName]).capitalize().s});
-			}
+		target.save().success(function(obj) {
+			controller.sendMessage(conn, strings.set, {property: S(strings[propertyName]).capitalize().s});
 		});
 	}
 }

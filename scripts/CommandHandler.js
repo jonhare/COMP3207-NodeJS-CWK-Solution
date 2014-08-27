@@ -7,6 +7,7 @@
  * @author Jonathon Hare (jsh2@ecs.soton.ac.uk)
  */
 var controller = require('./controller');
+var strings = require('./strings');
 
 module.exports = {
 	/**
@@ -34,7 +35,7 @@ module.exports = {
 	 *				be the #perform method.
 	 */
 	validate: function(conn, argsArr, cb) {
-		if (argsArr.length == 0)
+		if (argsArr.length === 0)
 			cb.apply(this, [conn, argsArr]);
 		else
 			controller.sendMessage(conn, strings.unknownCommand);
@@ -64,4 +65,4 @@ module.exports = {
 
 		return clone;
 	}
-}
+};

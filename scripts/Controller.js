@@ -7,15 +7,18 @@
  * @author Jonathon Hare (jsh2@ecs.soton.ac.uk)
  */
 var S = require('string');
-var strings = require('./strings');
+var strings = require('./Strings');
 var db = require('../models');
 var sequelize_fixtures = require('sequelize-fixtures');
+
+//will be set up on call to #init()
+var commands;
 
 /**
  * (private)
  * The list of active players [ {player: db.MUDObject, conn: ws.WebSocket} ]
  */
-var activePlayers = Array();
+var activePlayers = [];
 
 //The controller class (will be exported)
 var controller = {
@@ -403,7 +406,7 @@ module.exports = controller;
  * @return the arguments array
  */
 function getArgs(argsStr, nargs) {
-	var argsArr = Array();
+	var argsArr = [];
 	var first, rest;
 	var i, index;
 
@@ -418,7 +421,7 @@ function getArgs(argsStr, nargs) {
 		rest = argsStr;
 		for (i=0; i<nargs; i++) {
 			index = rest.indexOf(' ');
-			if (index == -1) {
+			if (index === -1) {
 				break;
 			}
 

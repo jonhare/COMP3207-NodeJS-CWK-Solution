@@ -44,7 +44,7 @@ if (!global.hasOwnProperty('db')) {
   //add relations/assocations by calling the `associate` method defined in the model
   Object.keys(global.db).forEach(function(modelName) {
     if ('associate' in global.db[modelName]) {
-      db[modelName].associate(db);
+      global.db[modelName].associate(global.db);
     }
   });
 }

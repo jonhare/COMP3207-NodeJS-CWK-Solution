@@ -1,6 +1,7 @@
-var controller = require('./controller');
-var predicates = require('./predicates');
-var strings = require('./strings');
+var db = require('../models');
+var controller = require('./Controller');
+var predicates = require('./Predicates');
+var strings = require('./Strings');
 var CommandHandler = require('./CommandHandler');
 var PropertyHandler = require('./PropertyHandler');
 
@@ -112,7 +113,7 @@ var commands = {
 			cb(conn, argsArr);
 		},
 		perform: function(conn, argsArr) {
-			var message = argsArr.length==0 ? "" : argsArr[0];
+			var message = argsArr.length===0 ? "" : argsArr[0];
 			var player = controller.findActivePlayerByConnection(conn);
 
 			controller.sendMessage(conn, strings.youSay, {message: message});
@@ -163,7 +164,7 @@ var commands = {
 	go: CommandHandler.extend({
 		nargs: 1,
 		validate: function(conn, argsArr, cb) {
-			if (argsArr.length == 1) {
+			if (argsArr.length === 1) {
 				cb(conn, argsArr);
 			} else {
 				controller.sendMessage(conn, strings.unknownCommand);
@@ -183,7 +184,7 @@ var commands = {
 
 					player.getContents().success(function(contents){
 						if (contents) {
-							var chainer = new db.Sequelize.Utils.QueryChainer;
+							var chainer = new db.Sequelize.Utils.QueryChainer();
 							for (var i=0; i<contents.length; i++) {
 								var ci = contents[i];
 								ci.locationId = ci.targetId;
@@ -573,6 +574,7 @@ var commands = {
 							controller.sendMessage(conn, strings.cantTakeLinkedExit);
 							return;
 						}
+						break;
 					case 'ROOM':
 						return; //*should* never be able to get here!!
 				}
@@ -697,7 +699,7 @@ var commands = {
 };
 
 //command aliases
-commands['goto'] = commands.go;
+commands.goto = commands.go;
 commands.move = commands.go;
 commands.cr = commands.create;
 commands.co = commands.connect;

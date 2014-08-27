@@ -1,5 +1,5 @@
 /**
- * models/mudobject.js
+ * models/MUDObject.js
  * 
  * Sequelize database table/object definition for a `MUDObject`.
  * Every thing in the game (players, rooms, exits and things)
@@ -45,9 +45,9 @@ module.exports = function(sequelize, DataTypes) {
 			values: ['ROOM', 'THING', 'EXIT', 'PLAYER'],
 			allowNull: false
 		},
-		/* bitflags defining the attributes of the object */
+		/* bit flags defining the attributes of the object */
 		flags: DataTypes.INTEGER,
-		/* Password (only for people) */
+		/* Password (only used for people) */
 		password: {
 			type: DataTypes.STRING,
 			allowNull: true
@@ -55,46 +55,55 @@ module.exports = function(sequelize, DataTypes) {
 	}, {
 		classMethods: {
 			associate: function(models) {
-	  			//the target of the object (this is where exits go and things dropped in rooms go)
+	  			/* the target of the object (this is where exits go and things dropped in rooms go) */
 				MUDObject.belongsTo(MUDObject, {foreignKey: 'targetId', as: 'target'});
 
-				//the location of the object
+				/*the location of the object */
 				MUDObject.belongsTo(MUDObject, {foreignKey: 'locationId', as: 'location'});
 
-				// owner who controls this object
+				/* owner who controls this object */
 				MUDObject.belongsTo(MUDObject, {foreignKey: 'ownerId', as: 'owner'});
 
-				// key required to use this object
+				/* key required to use this object */
 				MUDObject.belongsTo(MUDObject, {foreignKey: 'keyId', as: 'key'});
 			},
+			/* Attribute flags */
 			FLAGS: {
+				/* Anyone can link to this room */
 				link_ok: 1<<0,
+				/* The meaning of the lock applied to the object is reversed */
 				anti_lock: 1<<1,
+				/* Anything dropped in this room will go to its home */
 				temple: 1<<2
 			},
 		},
 		instanceMethods: {
+			/* Get a flag by name (corresponding to the property names in FLAGS) */
 			getFlag: function(flag) {
-				return this.flags & db.MUDObject.FLAGS[flag];
+				return this.flags & global.db.MUDObject.FLAGS[flag];
 			},
+			/* Can anyone can link to this room? */
 			canLink: function() {
-				return this.flags & db.MUDObject.FLAGS.link_ok;
+				return this.flags & global.db.MUDObject.FLAGS.link_ok;
 			},
+			/* Is the meaning of the key reversed on this object? */
 			hasAntiLock: function() {
-				return this.flags & db.MUDObject.FLAGS.anti_lock;
+				return this.flags & global.db.MUDObject.FLAGS.anti_lock;
 			},
+			/* Is the room a temple, where dropped items return to their homes? */
 			isTemple: function() {
-				return this.flags & db.MUDObject.FLAGS.temple;
+				return this.flags & global.db.MUDObject.FLAGS.temple;
 			},
+			/* Get the things contained in this room. Returns a promise that you can call .success(callback) on. */
 			getContents: function() {
-				return db.MUDObject.findAll({ where : {locationId: this.id}});
+				return global.db.MUDObject.findAll({ where : {locationId: this.id}});
 			},
+			/* Set a flag by value. Returns a promise that you can call .success(callback) on. */
 			setFlag: function(flagbit) {
-				console.log("Old " + this.flags);
 				this.flags |= flagbit;
-				console.log("Set " + this.flags);
 				return this.save();
 			},
+			/* Reset a flag by value. Returns a promise that you can call .success(callback) on. */
 			resetFlag: function(flagbit) {
 				this.flags &= ~flagbit;
 

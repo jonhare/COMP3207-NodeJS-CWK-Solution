@@ -5,6 +5,8 @@
  *
  * @author Jonathon Hare (jsh2@ecs.soton.ac.uk)
  */
+var db = require('../models');
+ 
 module.exports = {
 	/**
 	 * Test if the given password is valid
@@ -106,13 +108,13 @@ module.exports = {
 		var name = ftargets[0].name;
 
 		for (var i=1; i<ftargets.length; i++) {
-			if (name !== target.name) 
+			if (name !== ftargets[i].name) 
 				return false;
 		}
 
 		return true;
 	}
-}
+};
 
 
 //private functions
