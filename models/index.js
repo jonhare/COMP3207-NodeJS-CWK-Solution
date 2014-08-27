@@ -38,7 +38,7 @@ if (!global.hasOwnProperty('db')) {
   global.db = {
     Sequelize:  Sequelize,
     sequelize:  sequelize,
-    MUDObject:  sequelize.import(__dirname + '/mudobject')
+    MUDObject:  sequelize.import(__dirname + '/MUDObject')
   };
 
   //add relations/assocations by calling the `associate` method defined in the model
