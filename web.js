@@ -34,6 +34,9 @@ db.sequelize.sync().complete(function(err) {
 			res.render("index.jade", {});
 		});
 
+		//static files
+		app.use('/static', express.static(__dirname + '/public'));
+
 		//Create and start the HTTP server
 		var server = http.createServer(app);
 		server.listen(httpPort);

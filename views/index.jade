@@ -2,9 +2,9 @@ doctype html
 html(lang="en")
 	head
 		title COMP3207 :: ECS-MUD
-		script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js')
-		script(type='text/javascript', src='http://terminal.jcubic.pl/js/jquery.terminal-0.8.8.min.js')
-		script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.11/jquery.mousewheel.min.js')
+		script(type='text/javascript', src='/static/js/jquery.min.js')
+		script(type='text/javascript', src='/static/js/jquery.terminal-0.8.8.min.js')
+		script(type='text/javascript', src='/static/js/jquery.mousewheel.min.js')
 		script(type='text/javascript').
 			function init() {
 				if (!("WebSocket" in window)) {
@@ -55,7 +55,7 @@ html(lang="en")
 			$(init);
 
 		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Courier+New')
-		link(rel='stylesheet', href='http://terminal.jcubic.pl/css/jquery.terminal.css')
+		link(rel='stylesheet', href='/static/css/jquery.terminal.css')
 		style.
 			body {
 				font-family: "monospace";
