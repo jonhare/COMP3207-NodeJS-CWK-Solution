@@ -63,11 +63,11 @@ module.exports = {
 	homeSet: 			"Home set.", 
 	linked:				"Linked.",
 	exitBeingCarried: 	"That exit is being carried.",
+	lockUnknown: 		"Lock what?",
 	unlockUnknown: 		"Unlock what?",
 	unlocked:			"Unlocked.",
 	locked:				"Locked.",
 	leaves: 			"{{name}} has left.",
-	
 	set: 				"{{property}} set.",
 	reset: 				"{{property}} reset.",
 	setUnknown:  		"Set what?",
@@ -77,16 +77,13 @@ module.exports = {
 	othersFailureMessage: "others failure message",
 	description:  		"description",
 	name: 				"name",
-
 	cantTakeThat: 		"You can't take that!",
 	cantTakeLinkedExit:	"You can only take unlinked exits.",
 	alreadyHaveThat: 	"You already have that.",
 	taken: 				"Taken.",
 	takeUnknown: 		"Take what?", 
-
-	examineContents: 	"Contents:",
+	examineUnknown: 	"Examine what?",
 	examineContentsName:"\t{{type}} {{name}}",
-
 	examine: 			"{{name}} (#{{id}})\n" +
 						"Description: {{description}}\n" + 
 						"Failure message: {{failureMessage}}\n" + 
@@ -100,13 +97,22 @@ module.exports = {
 						"Location: {{locationId}}\n" +
 						"Owner: {{ownerId}}\n" + 
 						"Key: {{keyId}}\n",
-
 	isNotAvailable: 	"I don't recognize that name.",
 	page: 				"You sense that {{name}} is looking for you in {{location}}.", 
 	pageOK: 			"Your message has been sent.",
-
 	changePasswordFail: "Sorry.",
 	changePasswordSuccess: "Password changed.",
 	dontHave: 			"You don't have that.",
 	dropped: 			"Dropped.", 
+	noPlaceLikeHome: 	"There's no place like home...",
+	goneHome: 			"You wake up back home, without your possessions.",
+	goesHome: 			"{{name}} goes home.", 
+	carrying: 			"Carrying:",
+	carryingNothing: 	"You aren't carrying anything.",
+	youAreCarrying: 	"You are carrying:",
+	roomNameOwner: 		"{{name}} (#{{id}})",
+	roomName: 			"{{name}}",
+	opened: 			"Opened.", 
+	created: 			"Created.",
+	keyUnknown:  		"Lock with what?", 
 };

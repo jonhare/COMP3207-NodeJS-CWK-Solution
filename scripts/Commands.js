@@ -195,12 +195,11 @@ var commands = {
 							});
 						}
 
-						controller.sendMessage(conn, "There's no place like home...");
-						controller.sendMessage(conn, "There's no place like home...");
-						controller.sendMessage(conn, "There's no place like home...");
-
+						for (var i=0; i<3; i++)
+							controller.sendMessage(conn, strings.noPlaceLikeHome);
+						
 						player.setLocation(loc).success(function() {
-							controller.sendMessage(conn, 'You wake up back home, without your possessions.');
+							controller.sendMessage(conn, strings.goneHome);
 							commands.look.lookRoom(conn, loc);
 						});
 					});
@@ -263,7 +262,7 @@ var commands = {
 					break;
 				case 'PLAYER':
 					commands.look.lookSimple(conn, obj);
-					commands.look.lookContents(conn, obj, 'Carrying:');
+					commands.look.lookContents(conn, obj, strings.carrying);
 					break;
 				default:
 					commands.look.lookSimple(conn, obj);
@@ -273,20 +272,20 @@ var commands = {
 			var player = controller.findActivePlayerByConnection(conn);
 
 			if (predicates.isLinkable(room, player)) {
-				controller.sendMessage(conn, "{{name}} (#{{id}})", room);
+				controller.sendMessage(conn, strings.roomNameOwner, room);
 			} else {
-				controller.sendMessage(conn, "{{name}}", room);
+				controller.sendMessage(conn, strings.roomName, room);
 			}
 			if (room.description) controller.sendMessage(conn, room.description);
 
 			predicates.canDoIt(controller, player, room, function() {
-				commands.look.lookContents(conn, room, 'Contents:');
+				commands.look.lookContents(conn, room, strings.contents);
 			});
 		},
 		lookSimple: function(conn, obj) {
 			controller.sendMessage(conn, obj.description ? obj.description : strings.nothingSpecial);
 		},
-		lookContents: function(conn, obj, name) {
+		lookContents: function(conn, obj, name, fail) {
 			obj.getContents().success(function(contents) {
 				if (contents) {
 					var player = controller.findActivePlayerByConnection(conn);
@@ -300,6 +299,9 @@ var commands = {
 						for (var i=0; i<contents.length; i++) {
 							controller.sendMessage(conn, contents[i].name);
 						}
+					} else {
+						if (fail)
+							controller.sendMessage(conn, fail);
 					}
 				} 
 			});
@@ -308,7 +310,7 @@ var commands = {
 	inventory: CommandHandler.extend({
 		perform: function(conn, argsArr) {
 			var player = controller.findActivePlayerByConnection(conn);
-			commands.look.lookContents(conn, player, 'Carrying:');
+			commands.look.lookContents(conn, player, strings.youAreCarrying, strings.carryingNothing);
 		}
 	}),
 	"@dig": PropertyHandler.extend({
@@ -388,7 +390,7 @@ var commands = {
 			player.getLocation().success(function(loc) {
 				if (loc.ownerId === player.id) {
 					controller.createMUDObject(conn, {name: exitName, type: 'EXIT', locationId: loc.id, ownerId: player.id}, function(exit) {
-						controller.sendMessage(conn, "Opened.");
+						controller.sendMessage(conn, strings.opened);
 					});
 				} else {
 					controller.sendMessage(conn, strings.permissionDenied);
@@ -487,7 +489,7 @@ var commands = {
 			var objectName = argsArr[0];
 
 			controller.createMUDObject(conn, {name: objectName, type: 'THING', locationId: player.id, targetId: player.targetId, ownerId: player.id}, function(thing) {
-				controller.sendMessage(conn, "Created.");
+				controller.sendMessage(conn, strings.created);
 			});
 		}
 	}),
@@ -547,7 +549,7 @@ var commands = {
 
 					obj.getContents().success(function(contents) {
 						if (contents && contents.length > 0) {
-							controller.sendMessage(conn, strings.examineContents);
+							controller.sendMessage(conn, strings.contents);
 							for (var i=0; i<contents.length; i++) {
 								controller.sendMessage(conn, strings.examineContentsName, contents[i]);
 							}
@@ -656,7 +658,7 @@ var commands = {
 			var index = argsArr[0].indexOf("=");
 			var targetName = argsArr[0].substring(0, index).trim();
 			var value = argsArr[0].substring(index + 1).trim();
-			var isReset = value.indexOf('!')===0;
+			var isReset = value.indexOf('!') === 0;
 
 			if (isReset)
 				value = value.substring(1);
@@ -694,6 +696,14 @@ var commands = {
 			} else {
 				controller.sendMessage(conn, strings.isNotAvailable);
 			}
+		}
+	}),
+	//debugging only!
+	dump: CommandHandler.extend({
+		perform: function(conn, argsArr) {
+			db.MUDObject.findAll().success(function(objs){
+				controller.sendMessage(conn, JSON.stringify(objs, null, '\t'));
+			});
 		}
 	})
 };
