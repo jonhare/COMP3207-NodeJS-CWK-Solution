@@ -55,9 +55,15 @@ html(lang="en")
 
 			$(init);
 
-		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Courier+New')
 		link(rel='stylesheet', href='/static/css/jquery.terminal.css')
 		style.
+			@font-face {
+				font-family: 'Courier New';
+				font-style: normal;
+				font-weight: 400;
+				src: local('Courier New'), local('CourierNewPSMT'), url(/static/fonts/Courier+New.woff) format('woff');
+			}
+
 			body {
 				font-family: "monospace";
 				background: #333333; 
