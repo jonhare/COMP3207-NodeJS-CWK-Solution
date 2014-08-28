@@ -151,12 +151,8 @@ function couldDoIt(player, thing, callback) {
 		return;
 	}
 
-	db.MUDObject.find({where: {locationId: player.id, id: keyId}}).complete(function(err, obj) {
-		if (!!err) {
-			throw {name: "FatalError", description: err};
-		} else {
-			if (obj) callback(!thing.hasAntiLock());
-			else callback(thing.hasAntiLock());
-		}
+	db.MUDObject.find({where: {locationId: player.id, id: keyId}}).success(function(obj) {
+		if (obj) callback(!thing.hasAntiLock());
+		else callback(thing.hasAntiLock());
 	});
 }

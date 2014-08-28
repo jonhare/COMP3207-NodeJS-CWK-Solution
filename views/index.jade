@@ -31,7 +31,7 @@ html(lang="en")
 							ws.close();
 						} else {
 							term.clear();
-							$('#connect').html('Disconnect');
+							$('#connect').html('click here to disconnect');
 							ws = new WebSocket('ws://' + window.location.host + '/ws');
 							ws.onmessage = function(msg) {
 								term.echo(msg.data);
@@ -40,12 +40,13 @@ html(lang="en")
 								term.clear();
 								term.echo('Disconnected.');
 								term.pause();
-								$('#connect').html('Connect');
+								$('#connect').html('click here to connect');
 								ws.close();
 								ws = undefined;
 							};
 
 							term.resume();
+							$('#connect').blur();
 							term.focus(true);
 						}
 					});
@@ -77,9 +78,49 @@ html(lang="en")
 				color: #669999;
 				font-size: 16px;
 			}
+			#connect {
+				outline: none;
+				font-family: "Courier New";
+				background-color:#669999;
+				-webkit-border-top-left-radius:20px;
+				-moz-border-radius-topleft:20px;
+				border-top-left-radius:20px;
+				-webkit-border-top-right-radius:20px;
+				-moz-border-radius-topright:20px;
+				border-top-right-radius:20px;
+				-webkit-border-bottom-right-radius:20px;
+				-moz-border-radius-bottomright:20px;
+				border-bottom-right-radius:20px;
+				-webkit-border-bottom-left-radius:20px;
+				-moz-border-radius-bottomleft:20px;
+				border-bottom-left-radius:20px;
+				border-width:0;
+				text-indent:0;
+				display:inline-block;
+				color:#ffffff;
+				font-size:18px;
+				font-weight:bold;
+				font-style:normal;
+				height:50px;
+				line-height:50px;
+				width:350px;
+				text-decoration:none;
+				text-align:center;
+			}
+			#connect:hover {
+				background-color:#4197ee;
+			}
+			#connect:active {
+				position:relative;
+				top:1px;
+			}
+			.container {
+				text-align: center;
+			}
 	body
 		div#wrapper
-			div#container
+			div
 				h1 COMP3207 :: ECS-MUD
 				div#terminal
-				button#connect Connect
+			div.container
+				button#connect click here to connect

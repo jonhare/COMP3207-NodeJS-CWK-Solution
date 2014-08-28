@@ -58,7 +58,11 @@ var controller = {
 	 * @param message [string] the message typed by the user
 	 */
 	handleMessage: function(conn, message) {
-		try {
+		var d = require('domain').create();
+		d.on('error', function(err) {
+			console.log(err.name + " " + err.message);
+		});
+		d.run(function() {
 			var firstSpace = message.indexOf(' ');
 			var commandStr = firstSpace === -1 ? message.trim() : message.substring(0, firstSpace).trim();
 			var argsStr = firstSpace === -1 ? "" : message.substring(firstSpace + 1).trim();
@@ -92,11 +96,7 @@ var controller = {
 				else
 					controller.splashScreen(conn);
 			}
-		} catch (e) {
-			//if a fatal error occurred, the connection will have been closed 
-			//already, and an exception raised to jump us to this point.
-			console.log(e.name + ": " + e.message);
-		}
+		});
 	},
 	/**
 	 * Activate a player by adding them to the list of active players and connections
