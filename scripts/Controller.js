@@ -36,7 +36,16 @@ var controller = {
 				controller.defaultRoom = room;
 			} else {
 				sequelize_fixtures.loadFile('data/small.json', {MUDObject: db.MUDObject}, function() {
-					controller.init();
+					if (db.sequelize.options.dialect === 'postgres') {
+						//postgres seems to get itself in a mess with sequelize_fixtures and lose track of the auto-incrementing object ids, so we reset it manually here:
+						db.sequelize.query('SELECT setval(pg_get_serial_sequence(\'"MUDObjects"\', \'id\'), (SELECT MAX(id) FROM "MUDObjects")+1);').success(
+							function() {
+								controller.init();
+							}
+						);
+					} else {
+						controller.init();
+					}
 				});
 			}
 		});
@@ -252,10 +261,8 @@ var controller = {
 	 *				Takes a single parameter of the (db.MUDObject) that was created.
 	 */
 	createMUDObject: function(conn, obj, cb) {
-		console.log("Creating MUD Object " +obj);
 		db.MUDObject.build(obj).save().complete(function(err, nobj) {
 			if (!!err) {
-				console.log("Error " + err);
 				fatalError(err, conn);
 			} else {
 				cb(nobj);
