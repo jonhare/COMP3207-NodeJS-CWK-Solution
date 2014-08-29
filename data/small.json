@@ -539,7 +539,7 @@
             "password": null,
             "createdAt": "2014-08-29T13:13:05.000Z",
             "updatedAt": "2014-08-29T13:13:05.000Z",
-            "targetId": null,
+            "targetId": 1,
             "locationId": 14,
             "ownerId": 2,
             "keyId": null
