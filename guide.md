@@ -15,7 +15,7 @@ This guide is largely based on ["A brief guide to TinyMUD"](http://www.mudbytes.
 **drop &lt;*object*&gt;**  
 **throw &lt;*object*&gt;**
 
-Drops the specified object. &lt;*object*&gt; can be either a thing or exit. Can only be used on objects you are carrying.
+Drops the specified object. &lt;*object*&gt; can be either a thing or exit. Can only be used on objects you are carrying. If the current room has the `temple` flag set, the object will return to its home; if the current room has a dropto set, the object will go the the dropto; otherwise, the item will be placed in the current room.
 
 ---------------------------------------
 
@@ -110,6 +110,7 @@ number.
 
 ---------------------------------------
 
+**@failure &lt;*object*&gt; [ =&lt;*message*&gt; ]**  
 **@fail &lt;*object*&gt; [ =&lt;*message*&gt; ]**
 
 Without a message argument, clears the failure message on &lt;*object*&gt;, otherwise sets it. The failure message is printed to a player when they unsuccessfully attempt to *use* the object.
@@ -148,6 +149,7 @@ Changes the name of the specified object. This can also be used to specify a new
 
 ---------------------------------------
 
+**@ofailure &lt;*object*&gt; [ =&lt;*message*&gt; ]**  
 **@ofail &lt;*object*&gt; [ =&lt;*message*&gt; ]**
 
 Without a message argument, clears the others failure message on &lt;*object*&gt;, otherwise sets it. The others failure message, prefixed by the player’s name, is shown to others when the player fails to use &lt;*object*&gt;.

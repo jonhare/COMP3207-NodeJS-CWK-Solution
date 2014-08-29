@@ -1,5 +1,5 @@
 /**
- * scripts/predicates.js
+ * scripts/Predicates.js
  * 
  * Predicates for checking whether something is a valid operation/value
  *

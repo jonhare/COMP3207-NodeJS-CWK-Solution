@@ -1,3 +1,11 @@
+/**
+ * scripts/Commands.js
+ * 
+ * This file provides the main game logic; unfortunately it's 
+ * not complete so you'll need to finish it!
+ *
+ * @author Jonathon Hare (jsh2@ecs.soton.ac.uk)
+ */
 var db = require('../models');
 var controller = require('./Controller');
 var predicates = require('./Predicates');
@@ -5,7 +13,16 @@ var strings = require('./Strings');
 var CommandHandler = require('./CommandHandler');
 var PropertyHandler = require('./PropertyHandler');
 
+/**
+ * The commands object is like a map of control strings (the commands detailed 
+ * in the ECS-MUD guide) to command handlers (objects extending from the 
+ * CommandHandler object) which perform the actions of the required command.
+ * 
+ * The controller (see Controller.js) parses the statements entered by the user,
+ * and passes the information to the matching property in the commands object.
+ */
 var commands = {
+	//handle user creation
 	create: CommandHandler.extend({
 		nargs: 2,
 		preLogin: true,
@@ -51,6 +68,7 @@ var commands = {
 			});
 		}
 	}),
+	//handle connection of an existing user
 	connect: CommandHandler.extend({
 		nargs: 2,
 		preLogin: true,
@@ -91,12 +109,14 @@ var commands = {
 			});
 		}
 	}),
+	//Disconnect the player
 	QUIT: CommandHandler.extend({
 		preLogin: true,
 		perform: function(conn, argsArr) {
 			conn.terminate();
 		}
 	}),
+	//List active players
 	WHO: CommandHandler.extend({
 		preLogin: true,
 		perform: function(conn, argsArr) {
@@ -107,6 +127,7 @@ var commands = {
 			});
 		}
 	}),
+	//Speak to other players
 	say: CommandHandler.extend({
 		nargs: 1,
 		validate: function(conn, argsArr, cb) {
@@ -120,47 +141,7 @@ var commands = {
 			controller.sendMessageRoomExcept(conn, strings.says, {name: player.name, message: message});
 		}
 	}),
-	whisper: CommandHandler.extend({
-		nargs: 1,
-		validate: function(conn, argsArr, cb) {
-			if (argsArr.length === 1 && argsArr[0].indexOf("=")>0)
-				cb(conn, argsArr);
-			else
-				controller.sendMessage(conn, strings.unknownCommand);
-		},
-		perform: function(conn, argsArr) {
-			var index = argsArr[0].indexOf("=");
-			var targetName = argsArr[0].substring(0, index);
-			var message = argsArr[0].substring(index + 1);
-			
-			var player = controller.findActivePlayerByConnection(conn);
-			var target = controller.findActivePlayerByName(targetName);
-			var targetConn = controller.findActiveConnectionByPlayer(target);
-			if (target && target.locationId === player.locationId) {
-				controller.sendMessage(conn, strings.youWhisper, {message: message, name: target.name});
-				controller.sendMessage(targetConn, strings.toWhisper, {message: message, name: player.name});
-
-				controller.applyToActivePlayers(function(otherconn, other) {
-					if (other.locationId === player.locationId && player !== other && target !== other) {
-						//1 in 10 chance that someone will hear what you whispered!
-						if (Math.random() < 0.9) {
-							controller.sendMessage(otherconn, strings.whisper, {fromName: player.name, toName: target.name});
-						} else {
-							controller.sendMessage(otherconn, strings.overheard, {fromName: player.name, toName: target.name, message: message});
-						}
-					}
-				});
-			} else {
-				controller.loadMUDObject(conn, {name: targetName, type:'PLAYER', locationId: player.locationId}, function(target) {
-					if (target) {
-						controller.sendMessage(conn, strings.notConnected, {name: target});
-					} else {
-						controller.sendMessage(conn, strings.notInRoom, {name: target});
-					}
-				});
-			}
-		}
-	}),
+	//move the player somewhere
 	go: CommandHandler.extend({
 		nargs: 1,
 		validate: function(conn, argsArr, cb) {
@@ -234,6 +215,7 @@ var commands = {
 			}
 		}
 	}),
+	//look at something
 	look: CommandHandler.extend({
 		nargs: 1,
 		validate: function(conn, argsArr, cb) {
@@ -307,6 +289,51 @@ var commands = {
 			});
 		}
 	}),
+	//set the description of something
+	"@describe": PropertyHandler.extend({
+		prop: 'description'
+	}),
+	whisper: CommandHandler.extend({
+		nargs: 1,
+		validate: function(conn, argsArr, cb) {
+			if (argsArr.length === 1 && argsArr[0].indexOf("=")>0)
+				cb(conn, argsArr);
+			else
+				controller.sendMessage(conn, strings.unknownCommand);
+		},
+		perform: function(conn, argsArr) {
+			var index = argsArr[0].indexOf("=");
+			var targetName = argsArr[0].substring(0, index);
+			var message = argsArr[0].substring(index + 1);
+			
+			var player = controller.findActivePlayerByConnection(conn);
+			var target = controller.findActivePlayerByName(targetName);
+			var targetConn = controller.findActiveConnectionByPlayer(target);
+			if (target && target.locationId === player.locationId) {
+				controller.sendMessage(conn, strings.youWhisper, {message: message, name: target.name});
+				controller.sendMessage(targetConn, strings.toWhisper, {message: message, name: player.name});
+
+				controller.applyToActivePlayers(function(otherconn, other) {
+					if (other.locationId === player.locationId && player !== other && target !== other) {
+						//1 in 10 chance that someone will hear what you whispered!
+						if (Math.random() < 0.9) {
+							controller.sendMessage(otherconn, strings.whisper, {fromName: player.name, toName: target.name});
+						} else {
+							controller.sendMessage(otherconn, strings.overheard, {fromName: player.name, toName: target.name, message: message});
+						}
+					}
+				});
+			} else {
+				controller.loadMUDObject(conn, {name: targetName, type:'PLAYER', locationId: player.locationId}, function(target) {
+					if (target) {
+						controller.sendMessage(conn, strings.notConnected, {name: target});
+					} else {
+						controller.sendMessage(conn, strings.notInRoom, {name: target});
+					}
+				});
+			}
+		}
+	}),
 	inventory: CommandHandler.extend({
 		perform: function(conn, argsArr) {
 			var player = controller.findActivePlayerByConnection(conn);
@@ -328,9 +355,6 @@ var commands = {
 				controller.sendMessage(conn, strings.invalidName);
 			}
 		}
-	}),
-	"@describe": PropertyHandler.extend({
-		prop: 'description'
 	}),
 	"@success": PropertyHandler.extend({
 		prop: 'successMessage'
@@ -611,16 +635,16 @@ var commands = {
 					var obj = fobjs[0];
 
 					player.getLocation().success(function(loc) {
-						if (loc.targetId === null) {
-							obj.setLocation(loc).success(function() {
-								controller.sendMessage(conn, strings.dropped);
-							});
-						} else if (loc.isTemple()) {
+						if (loc.isTemple()) {
 							//obj goes to its home
 							obj.getTarget().success(function(tgt) {
 								obj.setLocation(tgt).success(function() {
 									controller.sendMessage(conn, strings.dropped);
 								});
+							});
+						} else if (loc.targetId === null) {
+							obj.setLocation(loc).success(function() {
+								controller.sendMessage(conn, strings.dropped);
 							});
 						} else {
 							//obj goes to loc.target
@@ -718,5 +742,6 @@ commands.ofail = commands.ofailure;
 commands.read = commands.look;
 commands.get = commands.take;
 
+//The commands object is exported publicly by the module
 module.exports = commands;
 
