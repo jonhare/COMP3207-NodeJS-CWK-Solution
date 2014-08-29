@@ -964,5 +964,26 @@
             "ownerId": 2,
             "keyId": null
         }
+    },
+    {
+        "model": "MUDObject",
+        "data": {
+            "id": 47,
+            "name": "Erica The Rhino",
+            "description": "Erica is a cyber-rhino built for the Marwell Wildlife Go Rhino's event in 2013.",
+            "failureMessage": null,
+            "successMessage": null,
+            "othersFailureMessage": null,
+            "othersSuccessMessage": null,
+            "type": "THING",
+            "flags": null,
+            "password": null,
+            "createdAt": "2014-08-29T14:49:59.000Z",
+            "updatedAt": "2014-08-29T14:52:12.000Z",
+            "targetId": 1,
+            "locationId": 9,
+            "ownerId": 2,
+            "keyId": 47
+        }
     }
 ]

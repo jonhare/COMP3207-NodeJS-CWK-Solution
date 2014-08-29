@@ -252,8 +252,10 @@ var controller = {
 	 *				Takes a single parameter of the (db.MUDObject) that was created.
 	 */
 	createMUDObject: function(conn, obj, cb) {
+		console.log("Creating MUD Object " +obj);
 		db.MUDObject.build(obj).save().complete(function(err, nobj) {
 			if (!!err) {
+				console.log("Error " + err);
 				fatalError(err, conn);
 			} else {
 				cb(nobj);
