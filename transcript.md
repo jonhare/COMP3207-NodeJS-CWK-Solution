@@ -1,4 +1,6 @@
-This is a short transcript of a session involving two players, Jon and Ed. Both players have already been created, and are standing in the Zepler Foyer.
+#Sample transcript
+
+This is a short transcript of a session involving an interaction between two players, Jon and Ed. Both players have already been created, and are located in the Zepler Foyer.
 
 Ed  | Jon
 --- | ---
