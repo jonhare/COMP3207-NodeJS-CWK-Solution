@@ -7,8 +7,7 @@ Ed  | Jon
     | `> take TV`
 `< Jon tries to steal the TV, but it's firmly attached to the wall.` | `< The TV is firmly attached to the wall.`
     | `> lift`
-`< Jon presses the call button for the lift, waits momentarily for it to arrive, and then steps in once the doors have opened.`
-`< Jon has left.` | `< You press the call button for the lift, wait momentarily for it to arrive, and then step in once the doors have opened.`<br>`< Zepler Lift`<br>`< You are stood in a small lift. There are buttons to take you to Levels 1 through 4.`
+`< Jon presses the call button for the lift, waits momentarily for it to arrive, and then steps in once the doors have opened.`<br>`< Jon has left.` | `< You press the call button for the lift, wait momentarily for it to arrive, and then step in once the doors have opened.`<br>`< Zepler Lift`<br>`< You are stood in a small lift. There are buttons to take you to Levels 1 through 4.`
     | `> 3`<br>`< You press the button marked 3. You sense a slight motion of the floor, and after a short period a voice announces 'Level Three' and the doors slide open. As soon as they've opened you step out of the lift.`<br>`< Zepler Level 3 North Corridor`<br>`< You are at the north end of a corridor that leads off the the south. You can see doors to the undergraduate computer science laboratory and the stairwell, as well as a lift.`
 `> stairs`<br>`< Zepler North Stairwell`<br>`< You are stood in a stairwell. There are posters from student projects on the walls, and the floor is covered in a blue linoleum material that squeaks as you walk. There are doors to Levels 1 though 4 and onto the roof.`<br>`> 3`
 `< Zepler Level 3 North Corridor`<br>`< You are at the north end of a corridor that leads off the the south. You can see doors to the undergraduate computer science laboratory and the stairwell, as well as a lift.`<br>`< Contents:`<br>`< Jon`<br> | `< Ed has arrived.`<br>
