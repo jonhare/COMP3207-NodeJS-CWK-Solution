@@ -726,6 +726,14 @@ var commands = {
 	dump: CommandHandler.extend({
 		perform: function(conn, argsArr) {
 			db.MUDObject.findAll().success(function(objs){
+				for (var i=0; i<objs.length; i++) {
+					var tmp = objs[i];
+					objs[i] = {
+						"model": "MUDObject",
+						"data": tmp
+					};
+				}
+
 				controller.sendMessage(conn, JSON.stringify(objs, null, '\t'));
 			});
 		}

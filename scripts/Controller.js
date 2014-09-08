@@ -333,10 +333,13 @@ var controller = {
 			return;
 		}
 
+		var escName = db.sequelize.getQueryInterface().escape('%' + name.toLowerCase() +'%');
+
 		if (type) {
 			controller.loadMUDObjects(conn, 
 				db.Sequelize.and(
-					{name: {like: '%' + name + '%'}},
+					//{name: {like: '%' + name + '%'}},
+					"lower(name) LIKE " + escName,
 					{'type': type},
 					db.Sequelize.or(
 						{locationId: player.locationId},
@@ -347,7 +350,8 @@ var controller = {
 		} else {
 			controller.loadMUDObjects(conn, 
 				db.Sequelize.and(
-					{name: {like: '%' + name + '%'}},
+					//{name: {like: '%' + name + '%'}},
+					"lower(name) LIKE " + escName,
 					db.Sequelize.or(
 						{locationId: player.locationId},
 						{locationId: player.id}
@@ -464,11 +468,11 @@ function fatalError(err, conn) {
 function filterPossible(obj, name) {
 	if (obj && obj.length > 0) {
 		var farr = obj.filter(function(o) {
-			if (o.name === name) return true;
+			if (o.name.toLowerCase() === name.toLowerCase()) return true;
 			
-			var strs = o.name.split(/[ ;]+/g);
+			var strs = o.name.toLowerCase().split(/[ ;]+/g);
 
-			if (strs.indexOf(name)>=0)
+			if (strs.indexOf(name.toLowerCase())>=0)
 				return true;
 
 			return false;
