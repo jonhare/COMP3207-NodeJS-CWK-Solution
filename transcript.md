@@ -1,3 +1,5 @@
+Ed | Jon
+---- | ----
 `> create Ed pw` | > `create Jon pw`
 `< Zepler Foyer` | < `Zepler Foyer`
 < You find yourself in the Zepler building foyer. You immediately feel at home due to the lack of any natural light. Looking around, you can see a doorway to some stairs, a lift, a corridor, the entrance to a room marked 'Seminar Room 1', a reception desk, and, the exit to Mountbatten.` | < ``You find yourself in the Zepler building foyer. You immediately feel at home due to the lack of any natural light. Looking around, you can see a `doorway to some stairs, a lift, a corridor, the entrance to a room marked 'Seminar Room 1', a reception desk, and, the exit to Mountbatten.
