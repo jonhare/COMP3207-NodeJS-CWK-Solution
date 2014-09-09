@@ -990,7 +990,7 @@
         "model": "MUDObject",
         "data": {
             "id": 48,
-            "name": "ride Erica The Rhino;ride erica the rhino",
+            "name": "ride Erica The Rhino",
             "description": null,
             "failureMessage": "You try to ride Erica, but only end up making a fool of yourself as you fall off and end up in a heap on the floor.",
             "successMessage": null,

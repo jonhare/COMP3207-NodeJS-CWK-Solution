@@ -5,6 +5,7 @@
  * not complete so you'll need to finish it!
  *
  * @author Jonathon Hare (jsh2@ecs.soton.ac.uk)
+ * @author ...
  */
 var db = require('../models');
 var controller = require('./Controller');
@@ -234,7 +235,7 @@ var commands = {
 			} else {
 				controller.findPotentialMUDObject(conn, argsArr[0], function(obj) {
 					commands.look.look(conn, obj);
-				}, true, true);
+				}, true, true, undefined, undefined, undefined, true);
 			}
 		},
 		look: function(conn, obj) {
@@ -752,4 +753,3 @@ commands.get = commands.take;
 
 //The commands object is exported publicly by the module
 module.exports = commands;
-
