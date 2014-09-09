@@ -1,14 +1,16 @@
-This is a short transcript of a session involving two players, Jon and Ed. Both players have already been created, and are standing in the Zepler Foyer.
+#Sample transcript
+
+This is a short transcript of a session involving an interaction between two players, Jon and Ed. Both players have already been created, and are located in the Zepler Foyer.
 
 Ed  | Jon
 --- | ---
     | `> connect Jon pw`<br>`< Zepler Foyer`<br>`< You find yourself in the Zepler building foyer. You immediately feel at home due to the lack of any natural light. Looking around, you can see a doorway to some stairs, a lift, a corridor, the entrance to a room marked 'Seminar Room 1', a reception desk, and, the exit to Mountbatten.`<br>`< Contents:`<br>`< Eric`<br>`< Vending Machine`<br>`< chairs`<br>`< Ed`<br>
 `> connect Ed pw`<br>`< Zepler Foyer`<br>`< You find yourself in the Zepler building foyer. You immediately feel at home due to the lack of any natural light. Looking around, you can see a doorway to some stairs, a lift, a corridor, the entrance to a room marked 'Seminar Room 1', a reception desk, and, the exit to Mountbatten.`<br>`< Contents:`<br>`< Eric`<br>`< Vending Machine`<br>`< chairs`<br>`< Jon` | `< Ed has connected.`
-    | `say Hi Ed`
-`Jon says "Hi Ed"` | `You say "Hi Ed"`
+    | `> say Hi Ed`
+`< Jon says "Hi Ed"` | `< You say "Hi Ed"`
 `> @create TV Screen`<br>`< Created.`<br>`> @lock TV=TV`<br>`< Locked.`<br>`> @failure TV=The TV is firmly attached to the wall.`<br>`< Failure message set.`<br>`> @ofailure TV=tries to steal the TV, but it's firmly attached to the wall.`<br>`< Others failure message set.`<br>`> @describe TV=A big plasma TV, showing useful information about ECS.`<br>`< Description set.`<br>`> drop TV`<br>`< Dropped.`<br> | 
 `say I've created a new TV for the foyer. Take a look.` | 
-`< You say "I've created a new TV for the foyer. Take a look."` | `Ed says 'I've created a new TV for the foyer. Take a look."`
+`< You say "I've created a new TV for the foyer. Take a look."` | `< Ed says "I've created a new TV for the foyer. Take a look."`
     | `> look`<br>`< Zepler Foyer`<br>`< You find yourself in the Zepler building foyer. You immediately feel at home due to the lack of any natural light. Looking around, you can see a doorway to some stairs, a lift, a corridor, the entrance to a room marked 'Seminar Room 1', a reception desk, and, the exit to Mountbatten.`<br>`< Contents:`<br>`< Eric`<br>`< Vending Machine`<br>`< chairs`<br>`< Ed`<br>`< TV Screen`<br>`> look TV`<br>`< A big plasma TV, showing useful information about ECS.`
     | `> take TV`
 `< Jon tries to steal the TV, but it's firmly attached to the wall.` | `< The TV is firmly attached to the wall.`
