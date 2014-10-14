@@ -8,7 +8,7 @@
 	╚══════╝ ╚═════╝╚══════╝      ╚═╝     ╚═╝ ╚═════╝ ╚═════╝            
 
 **The de-facto version of these instructions is available at [https://github.com/ECS-COMP3207-1415/CW1](https://github.com/ECS-COMP3207-1415/CW1).**
-
+ 
 ##Introduction
 A MUD (*Multi-User Dungeon*) is a multi-user virtual world described entirely by text. MUDs combine elements of role-playing games, interactive fiction and online chat. Originally, MUDs were connected to over the internet via the telnet protocol (try telnetting to PennMUSH (a MUSH is a variant of a MUD and stands for *Multi-User Shared Hallucination*) by typing `telnet mush.pennmush.org 4201` in a terminal). MUDs were extremely popular with undergraduate students of the late 80's and during this time it was sometimes said that the MUD acroynm stood for "Multiple Undergraduate Destroyer" due to their popularity amongst students and the amount of time devoted to them.
 	                                                                    
