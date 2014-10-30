@@ -387,7 +387,8 @@ var commands = {
 			var player = controller.findActivePlayerByConnection(conn);
 
 			if (oldPass === player.password && predicates.isPasswordValid(newPass)) {
-				player.setPassword(newPass).success(function() {
+				player.password = newPass;
+				player.save().success(function() {
 					controller.sendMessage(conn, strings.changePasswordSuccess);
 				});
 			} else {
@@ -431,8 +432,16 @@ var commands = {
 			var targetName = argsArr[0].substring(0, index).trim();
 			var value = argsArr[0].substring(index + 1).trim();
 
+			if (targetName === 'here' && value === 'home') {
+				commands["@set"].perform(conn, ["here=temple"]);
+				return;
+			}
+
 			if (value === 'here')
 				value = player.locationId;
+
+			if (value === 'home')
+				value = player.targetId;
 
 			controller.findPotentialMUDObject(conn, targetName, function(obj) {
 				controller.loadMUDObject(conn, {id: value, type: 'ROOM'}, function(room) {
@@ -487,7 +496,7 @@ var commands = {
 
 			controller.findPotentialMUDObject(conn, argsArr[0], function(obj) {
 				if (obj.ownerId === player.id) {
-					obj.setLocation(null).success(function() {
+					obj.setTarget(null).success(function() {
 						controller.sendMessage(conn, strings.unlinked);
 					});
 				} else {
@@ -723,6 +732,27 @@ var commands = {
 			}
 		}
 	}),
+	"@find": PropertyHandler.extend({
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+			var escName = db.sequelize.getQueryInterface().escape('%' + argsArr[0].toLowerCase() +'%');
+
+			controller.loadMUDObjects(conn, 
+				db.Sequelize.and(
+					"lower(name) LIKE " + escName,
+					{ownerId: player.id}
+				), function(objs) { 
+					if (objs && objs.length > 0) {
+						for (var i=0; i<objs.length; i++) {
+							controller.sendMessage(conn, "{{name}} {{id}}", objs[i]);
+						}
+					} else {
+						controller.sendMessage(conn, "Nothing found");
+					}
+				}
+			);
+		}
+	}),
 	//debugging only!
 	dump: CommandHandler.extend({
 		perform: function(conn, argsArr) {
@@ -743,11 +773,12 @@ var commands = {
 
 //command aliases
 commands.goto = commands.go;
+commands['throw'] = commands.drop;
 commands.move = commands.go;
 commands.cr = commands.create;
 commands.co = commands.connect;
-commands.fail = commands.failure;
-commands.ofail = commands.ofailure;
+commands['@fail'] = commands["@failure"];
+commands['@ofail'] = commands["@ofailure"];
 commands.read = commands.look;
 commands.get = commands.take;
 
