@@ -19,7 +19,7 @@ var db = require("./models");
 var httpPort = Number(process.env.PORT || 5000);
 
 //Configure the database
-db.sequelize.sync().then(function(err) {
+db.sequelize.sync().complete(function(err) {
 	if (err) {
 		throw err[0];
 	} else {

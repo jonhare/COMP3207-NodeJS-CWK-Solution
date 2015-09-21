@@ -18,15 +18,14 @@
   },
   "homepage": "https://github.com/jonhare/COMP3207-JSH2",
   "dependencies": {
-    "express": "^4.13.3",
-    "jade": "^1.11.0",
-    "pg": "^4.2.2",
-    "pg-hstore": "^2.3.2",
-    "sequelize": "^3.9.0",
-    "sequelize-fixtures": "^0.4.7",
+    "express": "^4.8.3",
+    "jade": "^1.5.0",
+    "pg": "^3.4.1",
+    "sequelize": "^1.7.9",
+    "sequelize-fixtures": "^0.3.1",
     "sqlite3": "^3.1.0",
-    "string": "^3.3.1",
-    "ws": "^0.8.0"
+    "string": "^1.9.1",
+    "ws": "^0.4.32"
   },
   "engines": {
     "node": ">=0.10.30"
