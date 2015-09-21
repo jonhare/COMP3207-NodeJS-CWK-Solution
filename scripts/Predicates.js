@@ -30,7 +30,7 @@ module.exports = {
 	 * @return true if valid; false otherwise
 	 */
 	isNameValid: function(str) {
-		return /[!-~]+/.test(str);
+		return /[ -~]+/.test(str);
 	},
 	/**
 	 * Test if a player can `@link` a specific room

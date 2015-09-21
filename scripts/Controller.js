@@ -369,8 +369,8 @@ var controller = {
 	 * or "here" to refer to the player or their location. Additionally, the type of object
 	 * being searched can be restricted.
 	 *
-	 * If more than one object matches the name, then the player can be alerted that the query 
-	 * was ambiguous and the callback will not be called.
+	 * If more than one object matches the name after filtering for exact matches, then the 
+	 * player can be alerted that the query was ambiguous and the callback will not be called.
 	 *
 	 * If more than zero objects match the name, then the player can be alerted that the query 
 	 * failed and the callback will not be called.
@@ -404,7 +404,22 @@ var controller = {
 				if (obj.length === 1) {
 					cb(obj[0]);
 				} else {
-					controller.sendMessage(conn, ambigMsg);
+					//check for an object with exactly matching name
+					var count = 0, index = -1;
+					for (var i=0; i<obj.length; i++) {
+						if (obj[i].name.toLowerCase().trim() === name.toLowerCase().trim()) {
+							count++;
+							index = i;
+						}
+					}
+
+					if (count === 1) {
+						//found exact match
+						cb(obj[index]);
+					} else {
+						//still ambiguous
+						controller.sendMessage(conn, ambigMsg);
+					}
 				}
 			} else {
 				controller.sendMessage(conn, failMsg);

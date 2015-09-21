@@ -587,7 +587,7 @@ var commands = {
 							for (var i=0; i<contents.length; i++) {
 								controller.sendMessage(conn, strings.examineContentsName, contents[i]);
 							}
-						}	
+						}
 					});
 				} else {
 					controller.sendMessage(conn, strings.permissionDenied);
@@ -678,7 +678,7 @@ var commands = {
 				if (value.indexOf('!')===0)
 					value = value.substring(1);
 
-				if (db.MUDObject.FLAGS[value]) {
+				if (db.MUDObject.FLAGS[value] !== undefined) {
 					cb.apply(this, [conn, argsArr]);
 					return;
 				}

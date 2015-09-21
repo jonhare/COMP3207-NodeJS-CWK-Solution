@@ -1,6 +1,6 @@
 {
   "name": "COMP3207-JSH2",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Node MUD server",
   "main": "web.js",
   "scripts": {
@@ -11,22 +11,23 @@
     "url": "https://github.com/jonhare/COMP3207-JSH2.git"
   },
   "author": "Jonathon Hare",
-  "license": "Southampton",
+  "license": "UNLICENSED",
+  "private": true,
   "bugs": {
     "url": "https://github.com/jonhare/COMP3207-JSH2/issues"
   },
   "homepage": "https://github.com/jonhare/COMP3207-JSH2",
   "dependencies": {
-    "express": "^4.8.3",
-    "jade": "^1.5.0",
-    "pg": "^3.4.1",
-    "sequelize": "^1.7.9",
-    "sequelize-fixtures": "^0.3.1",
-    "sqlite3": "^2.1.19",
-    "string": "^1.9.1",
-    "ws": "^0.4.32"
+    "express": "^4.13.3",
+    "jade": "^1.11.0",
+    "pg": "^4.2.2",
+    "sequelize": "^3.9.0",
+    "sequelize-fixtures": "^0.4.7",
+    "sqlite3": "^3.1.0",
+    "string": "^3.3.1",
+    "ws": "^0.8.0"
   },
   "engines": {
-    "node": "0.10.30"
+    "node": ">=0.10.30"
   }
 }
