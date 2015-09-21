@@ -25,8 +25,10 @@ if (!global.hasOwnProperty('db')) {
       port:     match[4],
       host:     match[3],
       logging:  console.log,
-      dialectOptions: {
-        ssl: true
+      options: {
+        dialectOptions: {
+          ssl: true
+        }
       }
     });
   } else {
