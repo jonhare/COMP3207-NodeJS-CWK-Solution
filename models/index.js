@@ -25,6 +25,9 @@ if (!global.hasOwnProperty('db')) {
       port:     match[4],
       host:     match[3],
       logging:  console.log
+      dialectOptions: {
+        ssl: true
+      }
     });
   } else {
     //otherwise we'll just use SQLite (which doesn't require any setup :))
