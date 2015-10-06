@@ -246,9 +246,11 @@ var controller = {
 	 * @return (ws.WebSocket) the connection or undefined if the player is not connected
 	 */
 	findActiveConnectionByPlayer: function(player) {
-		for (var i=0; i<activePlayers.length; i++) {
-			if (activePlayers[i].player === player) {
-				return activePlayers[i].conn;
+		if (player !== undefined) {
+			for (var i=0; i<activePlayers.length; i++) {
+				if (activePlayers[i].player.id === player.id) {
+					return activePlayers[i].conn;
+				}
 			}
 		}
 		return undefined;
@@ -343,7 +345,8 @@ var controller = {
 					{'type': type},
 					db.Sequelize.or(
 						{locationId: player.locationId},
-						{locationId: player.id}
+						{locationId: player.id},
+						{id: player.locationId}
 					)
 				), function(objs){ cb(filterPossible(objs, name)); }
 			);
@@ -354,7 +357,8 @@ var controller = {
 					"lower(name) LIKE " + escName,
 					db.Sequelize.or(
 						{locationId: player.locationId},
-						{locationId: player.id}
+						{locationId: player.id},
+						{id: player.locationId}
 					)
 				), function(objs){ cb(filterPossible(objs, name)); }
 			);

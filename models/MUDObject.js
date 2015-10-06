@@ -58,7 +58,7 @@ module.exports = function(sequelize, DataTypes) {
 	  			/* the target of the object (this is where exits go and things dropped in rooms go) */
 				MUDObject.belongsTo(MUDObject, {foreignKey: 'targetId', as: 'target'});
 
-				/*the location of the object */
+				/* the location of the object */
 				MUDObject.belongsTo(MUDObject, {foreignKey: 'locationId', as: 'location'});
 
 				/* owner who controls this object */

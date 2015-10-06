@@ -13,6 +13,7 @@ var predicates = require('./Predicates');
 var strings = require('./Strings');
 var CommandHandler = require('./CommandHandler');
 var PropertyHandler = require('./PropertyHandler');
+var bfs = require('async-bfs');
 
 /**
  * The commands object is like a map of control strings (the commands detailed 
@@ -327,9 +328,9 @@ var commands = {
 			} else {
 				controller.loadMUDObject(conn, {name: targetName, type:'PLAYER', locationId: player.locationId}, function(target) {
 					if (target) {
-						controller.sendMessage(conn, strings.notConnected, {name: target});
+						controller.sendMessage(conn, strings.notConnected, {name: target.name});
 					} else {
-						controller.sendMessage(conn, strings.notInRoom, {name: target});
+						controller.sendMessage(conn, strings.notInRoom);
 					}
 				});
 			}
@@ -612,7 +613,8 @@ var commands = {
 						}
 						break;
 					case 'ROOM':
-						return; //*should* never be able to get here!!
+						controller.sendMessage(conn, strings.cantTakeThat);
+						return;
 				}
 
 				if (obj.locationId === player.id) {
@@ -747,10 +749,65 @@ var commands = {
 							controller.sendMessage(conn, "{{name}} {{id}}", objs[i]);
 						}
 					} else {
-						controller.sendMessage(conn, "Nothing found");
+						controller.sendMessage(conn, strings.notFound);
 					}
 				}
 			);
+		}
+	}),
+	"@path": PropertyHandler.extend({
+		perform: function(conn, argsArr) {
+			var player = controller.findActivePlayerByConnection(conn);
+			
+			//get current room
+			player.getLocation().success(function(startRoom) {
+				//get the target room
+				var targetName = argsArr[0];
+				controller.loadMUDObject(conn, {name: targetName, type: 'ROOM'}, function(endRoom) {
+					if (!endRoom) {
+						controller.sendMessage(conn, strings.notFound);
+					} else {
+						//breadth-first search for path to target room
+						bfs(startRoom.id, 
+							function(depth, node, cb) {
+								//get the connected rooms
+								controller.loadMUDObjects(
+									conn, 
+									db.Sequelize.and({ type: 'EXIT' }, {locationId: node}, { targetId: {ne: null} }),
+									function(e) { 
+										var rooms = [];
+										for (var i=0; i<e.length; i++) {
+											rooms.push(e[i].targetId);
+										}
+										cb(null, rooms);
+									}
+								);
+							}, 
+							function(node, cb) {
+								cb(null, endRoom.id === node); //test if destination found
+							}, 
+							function(err, path) {
+								if (path == null) {
+									controller.sendMessage(conn, strings.notFound);
+								} else {
+									commands["@path"].printPath(conn, path);
+								}
+							}
+						);
+					}
+				});
+			});
+		},
+		printPath: function(conn, path) {
+			controller.loadMUDObject(conn, {id: path.shift()}, function(current) {
+				controller.sendMessage(conn, current.name);
+
+				if (path.length == 0) return;
+				controller.loadMUDObject(conn, {targetId: path[0], locationId: current.id, type: 'EXIT'}, function(exit) {
+					controller.sendMessage(conn, strings.via, exit);
+					commands["@path"].printPath(conn, path);
+				});
+			});
 		}
 	}),
 	//debugging only!

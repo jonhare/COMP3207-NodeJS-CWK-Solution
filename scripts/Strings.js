@@ -115,4 +115,6 @@ module.exports = {
 	opened: 			"Opened.", 
 	created: 			"Created.",
 	keyUnknown:  		"Lock with what?", 
+	notFound: 			"Not found",
+	via: 				" -> {{name}}"
 };
