@@ -38,7 +38,16 @@ var PropertyHandler = CommandHandler.extend({
 		var targetName = argsArr[0].substring(0, index).trim();
 		var value = argsArr[0].substring(index + 1).trim();
 
-		updateProperty(conn, targetName, this.prop, value);
+		this.updateProperty(conn, targetName, this.prop, value);
+	},
+	/**
+	 * Updates a property of a MUDObject, checking for correct ownership
+	 * and non-ambiguous naming
+	 */
+	updateProperty: function(conn, targetName, propertyName, value) {
+		controller.findPotentialMUDObjects(conn, targetName, function(objs) {
+			updatePropertyInternal(conn, objs, propertyName, value);
+		}, true, true);
 	}
 });
 
@@ -71,20 +80,9 @@ function updatePropertyInternal(conn, targets, propertyName, value) {
 		var target = ftargets[0];
 
 		target[propertyName] = value;
-		target.save().success(function(obj) {
+		target.save().then(function(obj) {
 			controller.sendMessage(conn, strings.set, {property: S(strings[propertyName]).capitalize().s});
 		});
 	}
-}
-
-/**
- * (private)
- * Updates a property of a MUDObject, checking for correct ownership
- * and non-ambiguous naming
- */
-function updateProperty(conn, targetName, propertyName, value) {
-	controller.findPotentialMUDObjects(conn, targetName, function(objs) {
-		updatePropertyInternal(conn, objs, propertyName, value);
-	}, true, true);
 }
 

@@ -56,16 +56,16 @@ module.exports = function(sequelize, DataTypes) {
 		classMethods: {
 			associate: function(models) {
 	  			/* the target of the object (this is where exits go and things dropped in rooms go) */
-				MUDObject.belongsTo(MUDObject, {foreignKey: 'targetId', as: 'target'});
+				MUDObject.belongsTo(MUDObject, {foreignKey: 'targetId', as: 'target', constraints: false});
 
 				/* the location of the object */
-				MUDObject.belongsTo(MUDObject, {foreignKey: 'locationId', as: 'location'});
+				MUDObject.belongsTo(MUDObject, {foreignKey: 'locationId', as: 'location', constraints: false});
 
 				/* owner who controls this object */
-				MUDObject.belongsTo(MUDObject, {foreignKey: 'ownerId', as: 'owner'});
+				MUDObject.belongsTo(MUDObject, {foreignKey: 'ownerId', as: 'owner', constraints: false});
 
 				/* key required to use this object */
-				MUDObject.belongsTo(MUDObject, {foreignKey: 'keyId', as: 'key'});
+				MUDObject.belongsTo(MUDObject, {foreignKey: 'keyId', as: 'key', constraints: false});
 			},
 			/* Attribute flags */
 			FLAGS: {
@@ -94,16 +94,16 @@ module.exports = function(sequelize, DataTypes) {
 			isTemple: function() {
 				return this.flags & global.db.MUDObject.FLAGS.temple;
 			},
-			/* Get the things contained in this room. Returns a promise that you can call .success(callback) on. */
+			/* Get the things contained in this room. Returns a promise that you can call .then(callback) on. */
 			getContents: function() {
 				return global.db.MUDObject.findAll({ where : {locationId: this.id}});
 			},
-			/* Set a flag by value. Returns a promise that you can call .success(callback) on. */
+			/* Set a flag by value. Returns a promise that you can call .then(callback) on. */
 			setFlag: function(flagbit) {
 				this.flags |= flagbit;
 				return this.save();
 			},
-			/* Reset a flag by value. Returns a promise that you can call .success(callback) on. */
+			/* Reset a flag by value. Returns a promise that you can call .then(callback) on. */
 			resetFlag: function(flagbit) {
 				this.flags &= ~flagbit;
 

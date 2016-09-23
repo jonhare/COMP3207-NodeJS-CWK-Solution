@@ -14,7 +14,7 @@ module.exports = {
 	 * @return true if valid; false otherwise
 	 */
 	isPasswordValid: function(str) {
-		return /[!-~]+/.test(str);
+		return str !== undefined && /^[!-~]+$/.test(str);
 	},
 	/**
 	 * Test if the given username is valid
@@ -22,7 +22,7 @@ module.exports = {
 	 * @return true if valid; false otherwise
 	 */
 	isUsernameValid: function(str) {
-		return /[!-~^=]+/.test(str) && str.indexOf('=') === -1;
+		return str !== undefined && /^[!-~^=]+$/.test(str) && str.indexOf('=') === -1 && str !== "me" && str !== "here";
 	},
 	/**
 	 * Test if the given room/thing name is valid
@@ -30,7 +30,7 @@ module.exports = {
 	 * @return true if valid; false otherwise
 	 */
 	isNameValid: function(str) {
-		return /[ -~]+/.test(str);
+		return str !== undefined && /^[ -~]+$/.test(str) && str !== "me" && str !== "here";
 	},
 	/**
 	 * Test if a player can `@link` a specific room
@@ -48,7 +48,7 @@ module.exports = {
 	 * @param room the thing
 	 * @return true if the player can see the thing; false otherwise
 	 */
-	canSee: function(player, thing) {
+	isLookable: function(player, thing) {
 		if (thing.type === 'EXIT' || thing.id === player.id) 
 			return false;
 		return true;
@@ -151,7 +151,7 @@ function couldDoIt(player, thing, callback) {
 		return;
 	}
 
-	db.MUDObject.find({where: {locationId: player.id, id: keyId}}).success(function(obj) {
+	db.MUDObject.find({where: {locationId: player.id, id: keyId}}).then(function(obj) {
 		if (obj) callback(!thing.hasAntiLock());
 		else callback(thing.hasAntiLock());
 	});

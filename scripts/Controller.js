@@ -33,12 +33,15 @@ var controller = {
 		//setup the default location
 		controller.loadMUDObject(undefined, {id: 1}, function(room) {
 			if (room) {
+				console.log("");
+				console.log("!!! ECS-MUD has started !!!");
+				console.log("");
 				controller.defaultRoom = room;
 			} else {
-				sequelize_fixtures.loadFile('data/small.json', {MUDObject: db.MUDObject}, function() {
+				sequelize_fixtures.loadFile('data/small.json', {MUDObject: db.MUDObject}).then(function() {
 					if (db.sequelize.options.dialect === 'postgres') {
 						//postgres seems to get itself in a mess with sequelize_fixtures and lose track of the auto-incrementing object ids, so we reset it manually here:
-						db.sequelize.query('SELECT setval(pg_get_serial_sequence(\'"MUDObjects"\', \'id\'), (SELECT MAX(id) FROM "MUDObjects")+1);').success(
+						db.sequelize.query('SELECT setval(pg_get_serial_sequence(\'"MUDObjects"\', \'id\'), (SELECT MAX(id) FROM "MUDObjects")+1);').then(
 							function() {
 								controller.init();
 							}
@@ -46,6 +49,8 @@ var controller = {
 					} else {
 						controller.init();
 					}
+				}).catch(function(err) {
+					console.log(err);
 				});
 			}
 		});
@@ -123,7 +128,8 @@ var controller = {
 	 */
 	deactivatePlayer: function(conn) {
 		var player = controller.findActivePlayerByConnection(conn);
-		controller.broadcastExcept(conn, strings.hasDisconnected, player);
+		if (player)
+			controller.broadcastExcept(conn, strings.hasDisconnected, player);
 
 		for (var i=0; i<activePlayers.length; i++) {
 			if (activePlayers[i].conn === conn) {
@@ -263,12 +269,10 @@ var controller = {
 	 *				Takes a single parameter of the (db.MUDObject) that was created.
 	 */
 	createMUDObject: function(conn, obj, cb) {
-		db.MUDObject.build(obj).save().complete(function(err, nobj) {
-			if (!!err) {
-				fatalError(err, conn);
-			} else {
-				cb(nobj);
-			}
+		db.MUDObject.build(obj).save().then(function(nobj) {
+			cb(nobj);
+		}).catch(function(err) {
+			fatalError(err, conn);
 		});
 	},
 	/**
@@ -279,12 +283,10 @@ var controller = {
 	 *				Takes a single parameter of the (db.MUDObject) that was read.
 	 */
 	loadMUDObject: function(conn, obj, cb) {
-		db.MUDObject.find({ where : obj }).complete(function(err, dbo) {
-			if (!!err) {
-				fatalError(err, conn);
-			} else {
-				cb(dbo);
-			}
+		db.MUDObject.find({ where : obj }).then(function(dbo) {
+			cb(dbo);
+		}).catch(function(err) {
+			fatalError(err, conn);
 		});
 	},
 	/**
@@ -295,12 +297,10 @@ var controller = {
 	 *				Takes a single parameter of the array of [db.MUDObject]s that was read.
 	 */
 	loadMUDObjects: function(conn, obj, cb) {
-		db.MUDObject.findAll({ where : obj }).complete(function(err, dbo) {
-			if (!!err) {
-				fatalError(err, conn);
-			} else {
-				cb(dbo);
-			}
+		db.MUDObject.findAll({ where : obj }).then(function(dbo) {
+			cb(dbo);
+		}).catch(function(err) {
+			fatalError(err, conn);
 		});
 	},
 	/**
@@ -324,24 +324,25 @@ var controller = {
 		var player = controller.findActivePlayerByConnection(conn);
 
 		if (allowMe && name === 'me') {
-			cb([player]);
+			player.reload().then(function() {
+				cb([player]);
+			});
 			return;
 		}
 
 		if (allowHere && name === 'here') {
-			player.getLocation().success(function(obj) {
+			player.getLocation().then(function(obj) {
 				cb([obj]);
 			});
 			return;
 		}
 
-		var escName = db.sequelize.getQueryInterface().escape('%' + name.toLowerCase() +'%');
+		var escName = '%' + name.toLowerCase() +'%';
 
 		if (type) {
 			controller.loadMUDObjects(conn, 
 				db.Sequelize.and(
-					//{name: {like: '%' + name + '%'}},
-					"lower(name) LIKE " + escName,
+					["lower(name) LIKE ?", [escName]],
 					{'type': type},
 					db.Sequelize.or(
 						{locationId: player.locationId},
@@ -353,8 +354,7 @@ var controller = {
 		} else {
 			controller.loadMUDObjects(conn, 
 				db.Sequelize.and(
-					//{name: {like: '%' + name + '%'}},
-					"lower(name) LIKE " + escName,
+					["lower(name) LIKE ?", [escName]],
 					db.Sequelize.or(
 						{locationId: player.locationId},
 						{locationId: player.id},
@@ -482,6 +482,7 @@ function getArgs(argsStr, nargs) {
  * problem and they are disconnected before an exception is thrown.
  */
 function fatalError(err, conn) {
+	console.log("FatalError: " + err);
 	if (conn) {
 		conn.send("A fatal error occurred: " + err + "\n");
 		conn.send("You will be disconnected immediately!\n");
