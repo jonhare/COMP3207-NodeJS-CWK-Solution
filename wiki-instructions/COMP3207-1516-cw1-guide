@@ -1,0 +1,315 @@
+<span style="font-size:200%">'''A Brief guide to'''</span>
+
+[[File:ecs-mud.png]]
+
+
+
+== Acknowlegements ==
+
+This guide is largely based on [http://www.mudbytes.net/download:68:764/tinymud.ps.Z “A brief guide to TinyMUD”] by Jennifer Stone and Rusty C. Wright. ECS-MUD is largely a clone of Jim Aspnes’ TinyMUD version 1.4 from 1989, with a few features tweaked or removed.
+
+== Ordinary commands ==
+
+'''drop &lt;''object''&gt;'''<br />'''throw &lt;''object''&gt;'''
+
+Drops the specified object. &lt;''object''&gt; must be a thing. Can only be used on objects you are carrying. If the current room has the <code>temple</code> flag set, the object will return to its home; if the current room has a dropto set, the object will go the the dropto; otherwise, the item will be placed in the current room. If both flags are set, the object will return to its home.
+
+
+-----
+
+'''examine &lt;''name''&gt;'''
+
+Prints a detailed description of object specified by &lt;''name''&gt; giving name, description, owner, key, failure message, success message, others failure message, others success message, target, type, password and flags. This is followed by a list of contents (names and types) if there are any. Can only be used on objects you own that are visible to you (in the same room or in your inventory).
+
+
+-----
+
+'''get &lt;''object''&gt;'''<br />'''take &lt;''object''&gt;'''
+
+Gets the specified object. &lt;''object''&gt; must be a thing in the same room as you.
+
+
+-----
+
+'''go &lt;''direction''&gt;'''<br />'''go home'''<br />'''goto &lt;''direction''&gt;'''<br />'''goto home'''<br />'''move &lt;''direction''&gt;'''<br />'''move home'''
+
+Moves in the specified direction. '''go home''' is a special command that returns you to your home (initially the ''Zepler Foyer''). If the direction is unambiguous, the go may be omitted.
+
+
+-----
+
+'''inventory'''
+
+Lists what you are carrying.
+
+
+-----
+
+'''look &lt;''object''&gt;'''<br />'''read &lt;''object''&gt;'''
+
+&lt;''object''&gt; can be the name of the current room, or a thing, player, or direction within the current room or in your inventory. Prints a description of &lt;''object''&gt;. If the object name is omitted, then the current room is assumed.
+
+
+-----
+
+'''page &lt;''player''&gt;'''
+
+Used to inform an active player that you are looking for them. The targeted player will get a message telling them your name and location.
+
+
+-----
+
+'''say &lt;''message''&gt;'''
+
+Display the &lt;''message''&gt; with the notification that you said it to other players in the same room. For example, if your player’s name is Betty the other players in the same room will see:
+
+<pre>Betty says &quot;&lt;message&gt;&quot;</pre>
+
+-----
+
+'''whisper &lt;''player''&gt;=&lt;''message''&gt;'''
+
+&lt;''player''&gt; is presented with &lt;''message''&gt; saying that you whispered it. You can only whisper to players in the same room. The other players in the room will normally see the message:
+
+<pre>Betty whispers something to &lt;player&gt;.</pre>
+However, occasionally (with a 1 in 10 probability), another player might instead overhear your whisper and see:
+
+<pre>You overheard Betty whisper &quot;&lt;message&gt;&quot; to &lt;player&gt;.</pre>
+
+== Commands for modifying the dungeon ==
+
+'''@create &lt;''name''&gt;'''
+
+Creates a thing with the specified name. The thing will belong to you and be placed in your inventory. By default it will have it’s home set to your home.
+
+
+-----
+
+'''@describe &lt;''object''&gt;=&lt;''description''&gt;'''
+
+&lt;''object''&gt; can be a room, thing, player, or direction that is in the same room as you, or in your inventory.
+
+Sets the description a player sees when they use the command look &lt;''object''&gt;. If &lt;''object''&gt; is ''here'' it sets the description for the current room that is displayed when the room is entered. If &lt;''object''&gt; is me it sets the description for your character.
+
+You can only set the description of an object you own.
+
+
+-----
+
+'''@dig &lt;''name''&gt;'''
+
+Creates a new room with the specified name, and prints the room’s number.
+
+
+-----
+
+'''@failure &lt;''object''&gt; [ =&lt;''message''&gt; ]'''<br />'''@fail &lt;''object''&gt; [ =&lt;''message''&gt; ]'''
+
+Without a message argument, clears the failure message on &lt;''object''&gt;, otherwise sets it. The failure message is printed to a player when they unsuccessfully attempt to ''use'' the object.
+
+
+-----
+
+'''@find &lt;''name''&gt;'''
+
+Prints the name and object number of every room, thing, exit, <strike>or player</strike> that you control whose name (partially) matches &lt;''name''&gt;. For example:
+
+<pre>@find erica
+Erica The Rhino (#47)
+ride Erica The Rhino (#48)</pre>
+
+
+-----
+
+'''@path &lt;''name''&gt;'''
+
+Prints the shortest route to the room whose name '''exactly''' matches &lt;''name''&gt;. For example:
+<pre>@path STACS Office
+Zepler Foyer
+ -> doorway;stairs
+Zepler North Stairwell
+ -> level 3;Level 3
+Zepler Level 3 North Corridor
+ -> UG lab door
+UG Lab
+ -> STACS
+STACS Office
+</pre>
+
+-----
+
+'''@link &lt;''direction''&gt; = &lt;''room number | here | home''&gt;'''<br />'''@link &lt;''thing''&gt; = &lt;''room number | here | home''&gt;'''<br />'''@link &lt;''room''&gt; = &lt;''room number | here | home''&gt;'''
+
+In the first form links the exit of the current room specified by &lt;''direction''&gt; to the room specified by &lt;''room number''&gt; or <code>here</code> or <code>home</code>. The exit must be unlinked, and you must own the target room if its <code>link_ok</code> attribute is not set. If you don’t already own the exit its ownership is transferred to you.
+
+The second form sets the home for &lt;''thing''&gt;. If &lt;''thing''&gt; is ''me'' it sets your home. You must own the object and you must own the target room if its link_ok attribute is not set.
+
+The third form sets the ''dropto''; see the Dropto's section below for an explanation of dropto’s. You must own the room that the drop is being set on and you must own the target room if its link_ok attribute is not set.
+
+-----
+
+'''@lock &lt;''object''&gt;=&lt;''key''&gt;'''
+
+Sets a key (another object) for an object. Both the &lt;''object''&gt; and &lt;''key''&gt; must be in the current room or in your inventory. <code>here</code> and <code>me</code> are usable for both keys and objects. You need to own the object your are locking.
+
+In order to use &lt;''object''&gt; you must either be the key, or be carrying the key in your inventory, unless the <code>anti_lock</code> is set (see @set), in which case you must not be carrying the key or be the key.
+
+-----
+
+'''@name &lt;''object''&gt; = &lt;''name''&gt;'''
+
+Changes the name of the specified object. This can also be used to specify a new direction list for an exit (see for example @open).
+
+
+-----
+
+'''@ofailure &lt;''object''&gt; [ =&lt;''message''&gt; ]'''<br />'''@ofail &lt;''object''&gt; [ =&lt;''message''&gt; ]'''
+
+Without a message argument, clears the others failure message on &lt;''object''&gt;, otherwise sets it. The others failure message, prefixed by the player’s name, is shown to others when the player fails to use &lt;''object''&gt;.
+
+
+-----
+
+'''@open &lt;''direction''&gt; [ ; &lt;''other-dir''&gt; ]'''*
+
+Creates an unlinked exit in the current room in the specified direction(s). You must own the room in which the exit is being created. Once created, you (or any other player) may use the @link command to specify the room to which the exit leads. See also @name.
+
+
+-----
+
+'''@osuccess &lt;''object''&gt; [ =&lt;''message''&gt; ]'''
+
+Without a message argument, clears the others success message on &lt;''object''&gt;, otherwise sets it. The others success message, prefixed by the player’s name, is shown to others when the player successfully uses &lt;''object''&gt;.
+
+
+-----
+
+'''@password &lt;''old''&gt;=&lt;''new''&gt;'''
+
+Sets a new password; you must specify your old password to verify your identity.
+
+
+-----
+
+'''@set &lt;''object''&gt;=&lt;''flag''&gt;'''<br />'''@set &lt;''object''&gt;=!&lt;''flag''&gt;'''
+
+Sets (first form) or resets (second form) &lt;''flag''&gt; on &lt;''object''&gt;. The current flags are <code>anti_lock</code>, <code>link_ok</code>, and <code>temple</code>.
+
+
+-----
+
+'''@success &lt;''object''&gt; [ =&lt;''message''&gt;''' ]
+
+Without a message argument, clears the success message on &lt;''object''&gt;, otherwise sets it. The success message is printed when a player successfully uses &lt;''object''&gt;. Without &lt;''message''&gt; it clears the success message.
+
+
+-----
+
+'''@unlink &lt;''direction''&gt;'''
+
+Removes the link on the exit in the specified &lt;''direction''&gt;. You must own the exit. The exit may then be relinked by any player using the <code>@link</code> command and ownership of the exit transfers to that player.
+
+
+-----
+
+'''@unlock &lt;''object''&gt;'''
+
+Removes the lock on an object. Only the owner can unlock an object. The key '''does not''' need to be present to unlock the object. The object needs to be in the same room or in the player's inventory.
+
+== ECS-MUD concepts ==
+
+An ''object'' is either a player, room, thing, or exit.
+
+In addition to the commands listed above there are some built in words in ECS-MUD; ''me'' and ''here''. ''me'' refers to your character or player, and ''here'' refers to the room you are in. For example, you can use the <code>@describe</code> command to give yourself a description: <code>@describe me=You see a very wise computer scientist with a great knowledge of Javascript</code>.
+
+=== Success and the lack thereof ===
+
+Locks on objects determine whether you can use that object. When you can take a thing or use an exit you are successful in using that object. The converse is true for failure. The <code>@success</code>, <code>@osuccess</code>, <code>@fail</code>, and <code>@ofail</code> commands set the success and failure messages on objects.
+
+=== Object strings ===
+
+Every object has six strings:
+
+# Name. This is what you use with drop, examine, get, and so on.
+# Description. This is what is given when you use the look command.
+# Success message. This is what you see when you successfully use the object.
+# Others success message. This is what the other players see when you successfully use the object.
+# Failure message. This is what you see when you fail to use an object.
+# Others failure message. This is what the other players see when you fail to use an object.
+
+Success and failure messages are fairly straightforward. Just remember that for the messages set with <code>@osuccess</code> and <code>@ofail</code> the player’s name is prefixed onto the message when it is printed, while the messages set with <code>@success</code> and <code>@fail</code> are printed as-is.
+
+=== Object properties ===
+
+As listed in the <code>@set</code> command, objects can have any of the following properties:
+
+* '''link_ok''': You can link to a room if you control it, or if the room has its <code>link_ok</code> flag set. Being able to link to a room means that you can set the homes of things (or yourself) to that room, and you can set the destination of exits to that room. See also the <code>@link</code> command for additional information on linking and the section Dropto's section. Setting the <code>link_ok</code> flag on players, things, and exits currently has no effect.
+* '''temple''': When a room has its temple flag set, anything that you drop in this room will immediately return to it’s home location. Setting the <code>temple</code> flag on players, things, and exits currently has no effect.
+* '''anti_lock''': When an object has the anti_lock flag set together with a key object (see <code>@lock</code>), the meaning of the key is reverse (i.e. you must not be carrying the key (or be the key) to use the object).
+
+=== Control ===
+
+There are two rules for determining control:
+
+# You can control anything you own.
+# Anybody can control an unlinked exit (even if it is locked).
+
+=== Dropto’s ===
+
+When the <code>@link</code> command is used on a room, it sets a dropto location for that room. Any thing dropped in the room will go to that location. The special command <code>@link here = home</code> will make things dropped in the current room go to their homes rather than your home (note this is equivalent to setting the temple flag on the room). To remove the dropto on a room go into that room and use <code>@unlink here</code>. Note that dropto’s are not recursive, so a dropped item will only go directly to the dropto room, and not the dropto’s dropto (and so on).
+
+=== Homes ===
+
+Every thing or player has a home. For things, this is the location the thing returns to when sacrificed, when a player carrying it goes home, or when it is dropped. For players, this is where the player goes when they issue the home command. Homes may be set using the <code>@link</code> command; for example, <code>@link donut = <room-number></code> or <code>@link me = <room-number></code>. Exits may also be linked to the special location home; for example, <code>@link north = home</code> (note that the exit will always go to your home, not the home of the player using the exit).
+
+=== Recycling ===
+
+Nothing can be destroyed in ECS-MUD, but it is possible to recycle just about anything. The <code>@name</code> command can be used to rename objects, making it easy to turn a silk purse into a sow’s ear or vice versa.
+
+== Examples ==
+
+Here are some examples that demonstrate some of the features of ECS-MUD.
+
+=== Making your home ===
+
+The minimal steps for making your home are
+
+<ol style="list-style-type: decimal;">
+<li>Make the room for your home with the <code>@dig</code> command. Write down the room number in case the following step takes a long time.</li>
+<li>Make or acquire an exit. In order to use the <code>@open</code> command you must own the room that you are doing the <code>@open</code> in. The alternative is to find a room with an exit that isn’t linked and use it.</li>
+<li>Make a link to your home. Once you’ve made or found an unlinked exit simply use the <code>@link</code> command to link the exit to your room.</li>
+<li>Find a room to which you can make a link in order to have an exit from your room (this is a room with the <code>link_ok</code> flag set). For the sake of example we’ll pretend the number of this room is 711. Without this you’d be able to go to your home but you wouldn’t have any way to get out of it.</li>
+<li><p>Set the link from you to your home. Go into your room and do:</p>
+<pre>@link me = here</pre></li>
+<li><p>Make the exit and link it to the destination:</p>
+<pre>@open out
+@link out = 711</pre></li></ol>
+
+Of course there are probably various details that you would want to take care of in addition to the above steps. For example, if you’re antisocial and want to prevent other people from using your home room you’d do:
+
+<pre>@lock down = me</pre>
+assuming that down is the exit you made in step 2. Along a similar vein you might not want other people linking to your room in which case you’d turn off the <code>link_ok</code> flag on your room. You might also set the description of your home room. If you own the exit you could also set the success, others success, fail, and others fail messages on the exit to your home. Without the descriptions places and things are boring and uninteresting.
+
+=== Lock key boolean examples ===
+
+When using the <code>@lock</code> command the key is another object. For example, if a room has a direction out and you want to prevent players from carrying the object xyz when they go out, you would use
+
+<pre>@lock out = xyz
+@set out=anti_lock</pre>
+or if you want to prevent the player Julia from using the out exit you would use
+
+<pre>@lock out = Julia
+@set out=anti_lock</pre>
+
+== Ersatz commands ==
+
+You can make new commands by making an exit and then locking it to something impossible to have and then assigning the failure and others failure messages to it. For example, assume the following commands have been used:
+
+<pre>@open eat
+@link eat = here
+@lock eat = here
+@fail eat = You try to eat but only gag
+@ofail eat = tries to eat but instead gags</pre>
+Then when you use the command eat the others in the room will see “Betty tries to eat but instead gags” and you’ll see “You try to eat but only gag”.
+
+Note that this “new command” will only work in the room that you made it in.

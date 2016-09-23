@@ -1,0 +1,114 @@
+==COMP3207 2015/16 ECS-MUD individual node.js assignment specification==
+
+* Coursework one - "ECS-MUD"
+* Deadline: 1600 on Thursday 19 November 2015
+* Feedback: by Thursday 10 December 2015
+* Effort: 50 hours per student
+* Weighting: 40% of module evaluation
+
+== Introduction ==
+
+A MUD (''Multi-User Dungeon'') is a multi-user virtual world described entirely by text (see the [http://en.wikipedia.org/wiki/MUD wiki entry on MUD]). MUDs combine elements of role-playing games, interactive fiction and online chat. Originally, MUDs were accessed over the internet via telnet (try telnetting to PennMUSH (a MUSH is a variant of a MUD) by typing <code>telnet mush.pennmush.org 4201</code> in a terminal). MUDs were extremely popular with undergraduate students in the late 80’s (see the wiki page - during this time it was sometimes said that the MUD acronym stood for “Multiple Undergraduate Destroyer” due to their popularity amongst students and the amount of time students wasted playing).
+
+In this coursework you are going to extend a MUD engine called <code>ECS-MUD</code> using the [http://www.nodejs.org node.js] platform and deploy it in the cloud using the [http://www.heroku.com Heroku] service. Rather than using telnet for communication, ECS-MUD will communicate with clients using the new HTLM5 [https://www.websocket.org WebSockets] feature. We have provided a basic MUD implementation to get you started, although you will need to implement a number of features to complete the game.
+
+== Effort ==
+
+This coursework is worth 40% of the overall COMP3207 assessment and you should plan to spend about 50 hours on this assignment. This coursework is an ''individual'' piece of work and the usual rules regarding individual coursework and academic integrity apply. In particular, please note the [http://www.calendar.soton.ac.uk/sectionIV/academic-integrity-regs.html  University Academic Integrity Regulations].
+
+== Requirements ==
+
+You need to do three things to complete this coursework:
+
+# Complete the implementation of ECS-MUD so that it functions as per the description in the [[COMP3207-1516-cw1-guide|brief guide to ECS-MUD]].
+#* Development must be done using the GitHub repository we have set up for you (see below).
+#* All the code you write must be in the <code>scripts/Commands.js</code> file.
+#* The only other file you should need to edit is the <code>package.json</code> file in order to complete your details. 
+#* Do not add any additional node modules.
+# Deploy the completed game to the Heroku cloud platform.
+#* You will need to sign-up for a free basic Heroku account and create an app.
+#* Your Heroku app should be named <code>comp3207-cw1-1516-&lt;your-ecs-user-id&gt;</code> (i.e. mine is <code>comp3207-cw1-1516-jsh2</code>).
+#* You will also need to create a Heroku Postgresql ("hobby-dev") instance for the database (no charge is made for this).
+# Write a short report (see below for details on the required contents).
+
+== Deliverables ==
+
+# A working version of the MUD, deployed on the Heroku cloud platform
+# The source-code to the MUD, in your <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> GitHub repository
+# A copy of your <code>Commands.js</code> file (must be identical to your GitHub copy)
+# A short (maximum of 2 A4 sides) report (formatted as a PDF document) including the following:
+#* Your name, ECS/iSolutions user-name, University ID number, a link to your heroku app instance and a link to your <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> GitHub repository.
+#* A description of any problems or challenges you encountered implementing the requirements, with reflection on how well Node.js and Javascript provide a good fit (or not!) for the problem of implementing a MUD.
+#* Details of how you performed testing of the application, and what tools you used.
+#* The amount of time you spent on this coursework (in hours). 
+
+Deliverables 3 and 4 must be submitted to the ECS Handin system by the specified deadline. Note that late submission will be penalized using the standard University rules (10% per working day) and that no work will be accepted that is more than five days late.
+
+After your final submission to the ECS Handin system has been made, no changes can be made to either the GitHub code or the Heroku application (to make any change would be a serious breach of academic integrity).
+
+== Marking and feedback ==
+
+Testing of your MUD will be performed using a set of automated tools that will connect to your Heroku app instance. 
+
+'''Please do not change the password, name (or home) of the default <code>Eric</code> character, or the ownership and name of the <code>Zepler Foyer</code> room, because the automated scripts will use these for testing and you will lose marks if any changes are made.'''
+
+===Marking Scheme===
+
+{| class="wikitable"
+!Criterion!!Description!!Marks
+|-
+|Functionality||Submission of a working system||30%
+|-
+|Completeness||Successful implementation of all specified features||20%
+|-
+|Well-written code||Assessment of quality of code submitted||15%
+|-
+|Good software development practice||Assessment of quality of software development practice||15%
+|-
+|Well-designed system||Report on work submitted||20%
+|}
+
+===How to lose marks===
+
+You'll lose marks by:
+
+* Not following the instructions.
+* Not applying a sensible approach to software development.
+* Not making proper use of the tools.
+* Not following the instructions.
+
+===Feedback===
+
+Feedback will be given for each of these points. In addition, we will provide some limited feedback on your development methodology as evidenced through the GitHub commit logs.
+
+== Getting started ==
+
+A requirement of this coursework is the use of GitHub to develop your code. We have created a GitHub organisation for the class to which your GitHub account should have been added. If you look in your individual GitHub account, you should see you have a <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository. (If this repository is not there then [mailto:jsh2@ecs.soton.ac.uk email] or speak to [http://ecs.soton.ac.uk/people/jsh2 Jon] immediately.) Your individual copy of the <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository is private to you and the COMP3207 teaching staff (who will be able to see any code you push) hence fellow students will not have access to your source code.
+
+The <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository contains the initial implementation of ECS-MUD, together with essential documentation (a README file).
+
+On this wiki you can find the resources you'll need to finish the implementation:
+* The [[COMP3207-1516-cw1-guide|brief guide to ECS-MUD]] (the user manual for the game).
+* A [[COMP3207-1516-cw1-transcript|sample transcript]] of an interaction between players (intended to provide examples to the responses expected for the various game commands).
+* The [[COMP3207-1516-cw1-notes|programmer’s notes]] (contains notes and hints to help you run and develop the MUD).
+* The [[COMP3207-1516-cw1-faq|FAQ]] (frequently asked questions).
+* The [[COMP3207-1516-cw1-strings|list of strings]] (an exhaustive list of which strings are expected to be used in each method).
+
+
+== Questions ==
+
+We've started a list of frequently asked questions on the [[COMP3207-1516-cw1-faq|FAQ]] page.
+
+If you have any problems/questions not covered by the [[COMP3207-1516-cw1-faq|FAQ]] then [mailto:jsh2@ecs.soton.ac.uk email] or speak to [http://ecs.soton.ac.uk/people/jsh2 Jon], either in his office, or in one of the drop-in sessions in the Zepler computer labs that we will run during the module (depending on demand).
+
+== Bugs ==
+
+20 years ago Bill Gates explained Microsoft's approach to software quality in a famous quote “There are no significant bugs in our released software that any significant number of users want fixed”. We take a slightly different approach - if you do find a problem with the starter code provided, then please let us know straight away.
+
+==Relevant Learning Outcomes==
+
+* Demonstrate knowledge and understanding of the syntax and semantics of JavaScript
+* Design and implement a cloud-based application
+* Demonstrate knowledge and understanding of cloud computing and its advantages and disadvantages 
+
+JSH/EJZ 6 October 2015

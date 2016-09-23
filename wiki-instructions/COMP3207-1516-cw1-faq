@@ -1,0 +1,77 @@
+== Do I need to change the owner of an object? ==
+The ownerId of an object (room/thing/player) is set when that object is created to the id of the player that created it. None of the commands that need to be implemented should require a change of owner, with the exception of <code>@link</code>.
+
+== How do I implement the inventory? ==
+The inventory is the list of items that the player is carrying. These are objects that have their <code>locationId</code> set to the <code>id</code> of the player. When a player <code>takes</code> an object, then the object's location is set to the player.
+
+== Can I edit the PropertyHandler? ==
+No, you shouldn't edit the PropertyHandler.js file, but you can override its methods in copies of the <code>PropertyHandler</code> object you create in your Commands.js file. For example, you might extend <code>PropertyHandler</code> in order to implement the <code>take</code> functionality by overriding the <code>perform</code> method, whilst retaining the original <code>validate</code> method.
+
+== How do I separate the user from the message in commands like whisper? ==
+Read the documentation carefully - it clearly says the separator is an equals sign. Also note that the message can be longer than just a single word.
+
+== I'm trying to test whether two MUDObject instances are the same, but it's not working. Help? ==
+If you get copies of the same object from different places (i.e. as a result of two queries), then using the double or triple equals operator to compare them will not work (they are in fact different objects that just happen to represent the same data). You need to compare the objects by comparing their <code>id</code> property instead.
+
+== I'm trying to run for the first time and node is throwing an error about an invalid name. Help? ==
+Make sure you've completed your changes to the <code>package.json</code> file. Note that you need to remove the angle brackets (< and >) around your usernames.
+
+==Are all the strings we need in the Strings.js file==
+You '''must not''' use or create any custom strings for any function. The automated tests will check for the correct strings being used. If you have a query about what response string to use that isn't covered by the sample transcript or strings list then please ask. 
+
+==Can I @create multiple items with the same name?==
+Yes, this is allowed, although it obviously will lead to potential problems if you happen to have two or more of them stored in the same place as you'll have difficulty referring to one of them! The automated test scripts will not try and create multiple items with the same name.
+
+==How much code am I expected to write?==
+We expect that you would be able to complete the implementation in ~450 LOC (that's based on my implementation and includes all the lines that just have a single brace or bracket in them). Obviously this will vary depending on how much you space your code out and how many comments your make.
+
+==What is the point of the regular expressions like /[ -~]+/ in Predicates.js==
+The /[ -~]+/ refers to the complete range of '''printable''' ASCII characters. The regex should stop unprintable or extended characters being used.
+
+==Can the find command be used with no arguments?==
+No.
+
+==Can we have an example of a room, exit and link being created?==
+Sure:`
+
+''Note this assumes that you own the room in which you create the exit with @open, otherwise you would get the permission denied message''
+
+<code>
+>>> @dig office
+
+<<< Room "office" created with ID: 56.
+
+>>> @open office door
+
+<<< Opened.
+
+>>> @link office door=56
+
+<<< Linked.
+
+>>> go office door
+
+<<< office (#56)
+</code>
+
+
+==How does "home" work in @link==
+===...when setting a dropto?===
+Using <code>@link here=home</code> is identical to <code>@set here=temple</code>, so you you probably just call your @set perform method with the relevant arguments.
+
+===...in other cases?===
+<code>@link me=home</code> is allowed, but won't do anything as it's setting your home to your home!
+
+<code>@link an_exit=home</code> will link the exit "an_exit" to '''your''' home
+
+<code>@link a_thing=home</code> will set the home of  "a_thing" to '''your''' home
+
+==How does @open work with multiple exits?==
+@open only ever needs to create a single exit, however that exit can have multiple aliases. Each alias is separated by a semicolon. In terms of the implementation, all you need to do is create a single exit with the name set as whatever the user typed - you don't need to try and parse the different semicolon separated aliases as that is already handled for you by the existing code.
+
+==Is it possible to tell me which of the functions would require predicates.canDoIt to be used?==
+Just "go" and "take" (and their aliases).
+
+==I'm stuck trying to implement '''@path'''. Help?==
+(This is supposed to be a challenge!). Hint: think about what algorithm you would use to find the shortest path in an unweighted (potentially cyclic) graph, and take a look at the <code>package.json</code> file to see if perhaps there might be a node library included that will help you.
+

@@ -1,0 +1,98 @@
+= Sample transcript =
+
+This is a short transcript of a session involving an interaction between two players, Jon and Ed. Both players have already been created, and are located in the Zepler Foyer.
+
+<table border="1">
+<tr>
+<th>Ed</th>
+<th>Jon</th>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>&gt; connect Jon pw</code><br><code>&lt; Zepler Foyer</code><br><code>&lt; You find yourself in the Zepler building foyer. You immediately feel at home due to the lack of any natural light. Looking around, you can see a doorway to some stairs, a lift, a corridor, the entrance to a room marked 'Seminar Room 1', a reception desk, and, the exit to Mountbatten.</code><br><code>&lt; Contents:</code><br><code>&lt; Eric</code><br><code>&lt; Vending Machine</code><br><code>&lt; chairs</code><br><code>&lt; Ed</code><br>
+</td>
+</tr>
+<tr>
+<td>
+<code>&gt; connect Ed pw</code><br><code>&lt; Zepler Foyer</code><br><code>&lt; You find yourself in the Zepler building foyer. You immediately feel at home due to the lack of any natural light. Looking around, you can see a doorway to some stairs, a lift, a corridor, the entrance to a room marked 'Seminar Room 1', a reception desk, and, the exit to Mountbatten.</code><br><code>&lt; Contents:</code><br><code>&lt; Eric</code><br><code>&lt; Vending Machine</code><br><code>&lt; chairs</code><br><code>&lt; Jon</code>
+</td>
+<td><code>&lt; Ed has connected.</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>&gt; say Hi Ed</code></td>
+</tr>
+<tr>
+<td><code>&lt; Jon says "Hi Ed"</code></td>
+<td><code>&lt; You say "Hi Ed"</code></td>
+</tr>
+<tr>
+<td>
+<code>&gt; @create TV Screen</code><br><code>&lt; Created.</code><br><code>&gt; @lock TV=TV</code><br><code>&lt; Locked.</code><br><code>&gt; @failure TV=The TV is firmly attached to the wall.</code><br><code>&lt; Failure message set.</code><br><code>&gt; @ofailure TV=tries to steal the TV, but it's firmly attached to the wall.</code><br><code>&lt; Others failure message set.</code><br><code>&gt; @describe TV=A big plasma TV, showing useful information about ECS.</code><br><code>&lt; Description set.</code><br><code>&gt; drop TV</code><br><code>&lt; Dropped.</code><br>
+</td>
+<td></td>
+</tr>
+<tr>
+<td><code>&gt; say I've created a new TV for the foyer. Take a look.</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>&lt; You say "I've created a new TV for the foyer. Take a look."</code></td>
+<td><code>&lt; Ed says "I've created a new TV for the foyer. Take a look."</code></td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>&gt; look</code><br><code>&lt; Zepler Foyer</code><br><code>&lt; You find yourself in the Zepler building foyer. You immediately feel at home due to the lack of any natural light. Looking around, you can see a doorway to some stairs, a lift, a corridor, the entrance to a room marked 'Seminar Room 1', a reception desk, and, the exit to Mountbatten.</code><br><code>&lt; Contents:</code><br><code>&lt; Eric</code><br><code>&lt; Vending Machine</code><br><code>&lt; chairs</code><br><code>&lt; Ed</code><br><code>&lt; TV Screen</code><br><code>&gt; look TV</code><br><code>&lt; A big plasma TV, showing useful information about ECS.</code>
+</td>
+</tr>
+<tr>
+<td></td>
+<td><code>&gt; take TV</code></td>
+</tr>
+<tr>
+<td><code>&lt; Jon tries to steal the TV, but it's firmly attached to the wall.</code></td>
+<td><code>&lt; The TV is firmly attached to the wall.</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>&gt; lift</code></td>
+</tr>
+<tr>
+<td>
+<code>&lt; Jon presses the call button for the lift, waits momentarily for it to arrive, and then steps in once the doors have opened.</code><br><code>&lt; Jon has left.</code>
+</td>
+<td>
+<code>&lt; You press the call button for the lift, wait momentarily for it to arrive, and then step in once the doors have opened.</code><br><code>&lt; Zepler Lift</code><br><code>&lt; You are stood in a small lift. There are buttons to take you to Levels 1 through 4.</code>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>&gt; 3</code><br><code>&lt; You press the button marked 3. You sense a slight motion of the floor, and after a short period a voice announces 'Level Three' and the doors slide open. As soon as they've opened you step out of the lift.</code><br><code>&lt; Zepler Level 3 North Corridor</code><br><code>&lt; You are at the north end of a corridor that leads off the the south. You can see doors to the undergraduate computer science laboratory and the stairwell, as well as a lift.</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>&gt; stairs</code><br><code>&lt; Zepler North Stairwell</code><br><code>&lt; You are stood in a stairwell. There are posters from student projects on the walls, and the floor is covered in a blue linoleum material that squeaks as you walk. There are doors to Levels 1 though 4 and onto the roof.</code><br><code>&gt; 3</code>
+</td>
+<td></td>
+</tr>
+<tr>
+<td>
+<code>&lt; Zepler Level 3 North Corridor</code><br><code>&lt; You are at the north end of a corridor that leads off the the south. You can see doors to the undergraduate computer science laboratory and the stairwell, as well as a lift.</code><br><code>&lt; Contents:</code><br><code>&lt; Jon</code><br>
+</td>
+<td>
+<code>&lt; Ed has arrived.</code><br>
+</td>
+</tr>
+<tr>
+<td></td>
+<td><code>&gt; go lab</code></td>
+</tr>
+<tr>
+<td><code>&lt; Jon is denied access to the lab.</code></td>
+<td><code>&lt; The card-lock on the door says 'Access Denied'.</code></td>
+</tr>
+</table>

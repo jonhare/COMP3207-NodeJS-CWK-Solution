@@ -1,0 +1,63 @@
+= Programmer’s notes =
+
+== Tools required ==
+
+You will need access to [http://nodejs.org/download/ node] and [http://toolbelt.heroku.com/ Heroku toolbelt]. We’ve requested these be installed on the ECS lab machines, but if you’re using a different machine you’ll need to download/install them yourself: 
+* These do not necessarily need to be installed via the installer - there are straight binary packages that you can unpack and put in your filespace if you’re using university machines. 
+* If you download the binary version of ''node'' without the installer, you’ll also need to download [https://www.npmjs.org/doc/README.html npm]. 
+* If you are using the binary versions, you’ll need to setup your <code>PATH</code> so that the <code>node</code>, <code>npm</code> and <code>heroku</code> tools can be accessed from the command-line.
+
+== Running the application ==
+
+From a locally cloned copy of your <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository first edit the <code>package.json</code> file and replace all instances of <code><your-ecs-user-id></code> with your actual ECS user id, and all instances of <code><your-github-id></code> with your github id. Make sure you replace the angle brackets! You can then issue the following commands to run for the first time:
+
+<pre>npm install
+node web.js</pre>
+On subsequent runs you won’t need to run the <code>npm install</code> command. Once the application is running, you can connect to it as described in the next section. The application can be stopped by pressing <code>ctrl-c</code>.
+
+== Connecting to your application ==
+
+There are two ways to connect to the MUD: via the commmand-line, or via the built-in web interface. To access the web interface, open a browser and navigate to http://localhost:5000/.
+
+To connect via the command-line, you can use a <code>wscat</code> tool that was built when you performed the <code>npm install</code> command. <code>wscat</code> can be found at <code>&lt;your-github-id&gt;-CW1/node_modules/ws/bin/wscat</code> and run using the following command:
+
+<pre>wscat --connect http://localhost:5000/ws</pre>
+
+Note that if you're using Windows, you might need to run it as:
+
+<pre>node wscat --connect http://localhost:5000/ws</pre>
+
+== Working with Heroku ==
+
+You’ll need to login in to [http://www.heroku.com Heroku] (create a free account if you don’t already have one). Once you’ve got a heroku account setup, you’ll need to setup the Heroku toolbelt and configure <code>ssh</code> keys to allow you to push code to Heroku - follow the instructions [https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up here].
+
+ You'll then need to create a new application called <code>comp3207-cw1-1516-&lt;your ECS user id&gt;</code> (e.g. mine is <code>comp3207-cw1-1516-jsh2</code>). The application can either be created directly on the site, or using the heroku toolbelt command line tool.
+
+You should also provision a Heroku <code>postgresql</code> database (use the free "hobby-dev" plan) for your newly created app; again, this can be done on the site or via the heroku toolbelt command line tool.
+
+In order to deploy your app you will need to ensure you've correctly edited the <code>package.json</code> file as above. Depending on how you created the database, you might also need to ensure that it's provisioned as your applications primary database (see [https://devcenter.heroku.com/articles/heroku-postgresql#establish-primary-db this article]).
+
+You should then be able to follow the instructions in the [https://devcenter.heroku.com/articles/git Heroku dev center] to deploy the skeleton application (skip down to the bit about using an existing git repo (‘You can also take an existing Git repo…’)). Once done, you’ll be able to visit <code>http://comp3207-cw1-1516-&lt;your ECS user id&gt;.herokuapp.com</code> and test the application is working.
+
+=== Debugging on heroku ===
+
+Typing <code>heroku logs</code> on the command line will print out any errors encountered by the your application on the Heroku server, and is useful for finding problems. Any <code>console.log()</code> messages from your code will end up here.
+
+=== Databases ===
+
+When running locally during development the application uses SQLite as the database. The [http://www.sqlite.org/cli.html SQLite CLI] can be used to help debug the contents of the development database. If you ever need to reset the database completely, stop the node application and delete the database file (<code>dev-database.sqlite</code>).
+
+When deployed on Heroku, the postgresql database is used. There are good instructions on dealing with the Heroku postgresql database [https://devcenter.heroku.com/articles/heroku-postgresql here]. In particular, <code>heroku pg:psql</code> can be used to connect to your Heroku postgresql instance. The following commands can be used within the <code>psql</code> console to reset your database (removing all the tables):
+
+<pre>drop schema public cascade;
+create schema public;</pre>
+You can also type standard SQL commands to query the database, etc (note that table names are case sensitive and need to be double-quoted!). The command to quit is <code>\q</code>.
+
+== Hints and tips for completing the game ==
+
+* Spend some time understanding the code before you start - we’ve added plenty of comments to help you.
+* Make sure you can deploy the application to Heroku right at the start - don't leave this step until the deadline.
+* All the strings you should need for player communication are in the <code>scripts/Strings.js</code> file. The [[COMP3207-1516-cw1-transcript|sample transcript]] should give you enough hints to figure out which ones to use for what.
+* The <code>scripts/Predicates.js</code> file has checks for a number of things that you’ll need to check - please use them!
+** In particular, the <code>canDoIt</code> method provides all the logic required for testing whether an action (<code>go</code> or <code>take</code>) can be performed by a player on a thing, and also handles sending the relevant success/failure messages. This is also used in the (provided) <code>look</code> action for printing relevant messages.
+* The controller has some very useful methods for finding named objects (or a named object) accessible to the player (in the same room, or in their inventory). The name lookup scheme allows partial matches and automatically lets the player know if the name is ambiguous.
