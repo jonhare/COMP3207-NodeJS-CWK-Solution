@@ -32,7 +32,11 @@ html(lang="en")
 						} else {
 							term.clear();
 							$('#connect').html('click here to disconnect');
-							ws = new WebSocket('ws://' + window.location.host + '/ws');
+							if (location.protocol === 'https:') {
+								ws = new WebSocket('wss://' + window.location.host + '/ws');
+							} else {
+								ws = new WebSocket('ws://' + window.location.host + '/ws');
+							}
 							ws.onmessage = function(msg) {
 								term.echo(msg.data);
 							};
