@@ -9,7 +9,7 @@ You will need access to [http://nodejs.org/download/ node] and [http://toolbelt.
 
 == Running the application ==
 
-From a locally cloned copy of your <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository first edit the <code>package.json</code> file and replace all instances of <code><your-ecs-user-id></code> with your actual ECS user id, and all instances of <code><your-github-id></code> with your github id. Make sure you replace the angle brackets! You can then issue the following commands to run for the first time:
+From a locally cloned copy of your <code>ECS-COMP3207-1617/&lt;your-github-id&gt;-CW1</code> repository first edit the <code>package.json</code> file and replace all instances of <code><your-ecs-user-id></code> with your actual ECS user id, and all instances of <code><your-github-id></code> with your github id. Make sure you replace the angle brackets! You can then issue the following commands to run for the first time:
 
 <pre>npm install
 node web.js</pre>
@@ -31,13 +31,13 @@ Note that if you're using Windows, you might need to run it as:
 
 You’ll need to login in to [http://www.heroku.com Heroku] (create a free account if you don’t already have one). Once you’ve got a heroku account setup, you’ll need to setup the Heroku toolbelt and configure <code>ssh</code> keys to allow you to push code to Heroku - follow the instructions [https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up here].
 
- You'll then need to create a new application called <code>comp3207-cw1-1516-&lt;your ECS user id&gt;</code> (e.g. mine is <code>comp3207-cw1-1516-jsh2</code>). The application can either be created directly on the site, or using the heroku toolbelt command line tool.
+ You'll then need to create a new application called <code>comp3207-cw1-1617-&lt;your ECS user id&gt;</code> (e.g. mine is <code>comp3207-cw1-1617-jsh2</code>). The application can either be created directly on the site, or using the heroku toolbelt command line tool.
 
 You should also provision a Heroku <code>postgresql</code> database (use the free "hobby-dev" plan) for your newly created app; again, this can be done on the site or via the heroku toolbelt command line tool.
 
 In order to deploy your app you will need to ensure you've correctly edited the <code>package.json</code> file as above. Depending on how you created the database, you might also need to ensure that it's provisioned as your applications primary database (see [https://devcenter.heroku.com/articles/heroku-postgresql#establish-primary-db this article]).
 
-You should then be able to follow the instructions in the [https://devcenter.heroku.com/articles/git Heroku dev center] to deploy the skeleton application (skip down to the bit about using an existing git repo (‘You can also take an existing Git repo…’)). Once done, you’ll be able to visit <code>http://comp3207-cw1-1516-&lt;your ECS user id&gt;.herokuapp.com</code> and test the application is working.
+You should then be able to follow the instructions in the [https://devcenter.heroku.com/articles/git Heroku dev center] to deploy the skeleton application (skip down to the bit about using an existing git repo (‘You can also take an existing Git repo…’)). Once done, you’ll be able to visit <code>http://comp3207-cw1-1617-&lt;your ECS user id&gt;.herokuapp.com</code> and test the application is working.
 
 === Debugging on heroku ===
 
@@ -57,7 +57,7 @@ You can also type standard SQL commands to query the database, etc (note that ta
 
 * Spend some time understanding the code before you start - we’ve added plenty of comments to help you.
 * Make sure you can deploy the application to Heroku right at the start - don't leave this step until the deadline.
-* All the strings you should need for player communication are in the <code>scripts/Strings.js</code> file. The [[COMP3207-1516-cw1-transcript|sample transcript]] should give you enough hints to figure out which ones to use for what.
+* All the strings you should need for player communication are in the <code>scripts/Strings.js</code> file. The [[COMP3207-1617-cw1-transcript|sample transcript]] should give you enough hints to figure out which ones to use for what.
 * The <code>scripts/Predicates.js</code> file has checks for a number of things that you’ll need to check - please use them!
 ** In particular, the <code>canDoIt</code> method provides all the logic required for testing whether an action (<code>go</code> or <code>take</code>) can be performed by a player on a thing, and also handles sending the relevant success/failure messages. This is also used in the (provided) <code>look</code> action for printing relevant messages.
 * The controller has some very useful methods for finding named objects (or a named object) accessible to the player (in the same room, or in their inventory). The name lookup scheme allows partial matches and automatically lets the player know if the name is ambiguous.

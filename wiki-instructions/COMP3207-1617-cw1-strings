@@ -1,4 +1,4 @@
-This should be an exhaustive list of what strings are used explicitly in each method in my implementation of Commands.js (strings used in functions declared in the other files are not included).
+This should be an exhaustive list of what strings are used '''explicitly''' in each method in my implementation of Commands.js (strings used in functions declared in the other files are not included - this includes the default values used by methods like <code>findPotentialMUDObject</code>).
 
 ==create==
 *strings.badUsername
@@ -109,7 +109,6 @@ This should be an exhaustive list of what strings are used explicitly in each me
 *strings.dropped
 *strings.dropped
 *strings.dropped
-*strings.ambigSet
 
 ==@set==
 *strings.unknownCommand
@@ -125,6 +124,7 @@ This should be an exhaustive list of what strings are used explicitly in each me
 
 ==@find==
 *strings.notFound
+*strings.roomNameOwner
 
 ==@path==
 *strings.notFound

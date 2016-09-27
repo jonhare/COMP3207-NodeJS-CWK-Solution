@@ -14,7 +14,7 @@ In this coursework you are going to extend a MUD engine called <code>ECS-MUD</co
 
 == Effort ==
 
-This coursework is worth 40% of the overall COMP3207 assessment and you should plan to spend about 50 hours on this assignment. This coursework is an ''individual'' piece of work and the usual rules regarding individual coursework and academic integrity apply. In particular, please note the [http://www.calendar.soton.ac.uk/sectionIV/academic-integrity-regs.html  University Academic Integrity Regulations].
+This coursework is worth 40% of the overall COMP3207 assessment and you should plan to spend about 50 hours on this assignment. This coursework is an ''individual'' piece of work and the usual rules regarding individual coursework and academic integrity apply. In particular, please note the [http://www.calendar.soton.ac.uk/sectionIV/academic-integrity-regs.html  University Academic Integrity Regulations] and [https://secure.ecs.soton.ac.uk/notes/comp3207/1516/ejz/Academic_Integrity_Guidance.pdf Academic Integrity Guidance].
 
 == Requirements ==
 
@@ -83,7 +83,7 @@ Feedback will be given for each of these points. In addition, we will provide so
 
 == Getting started ==
 
-A requirement of this coursework is the use of GitHub to develop your code. We have created a GitHub organisation for the class to which your GitHub account should have been added. If you look in your individual GitHub account, you should see you have a <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository. (If this repository is not there then [mailto:jsh2@ecs.soton.ac.uk email] or speak to [http://ecs.soton.ac.uk/people/jsh2 Jon] immediately.) Your individual copy of the <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository is private to you and the COMP3207 teaching staff (who will be able to see any code you push) hence fellow students will not have access to your source code.
+A requirement of this coursework is the use of GitHub to develop your code. We have created a GitHub organisation for the class to which your GitHub account should have been added. If you look in your individual GitHub account, you should see you have a <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository. (If this repository is not there then [mailto:jsh2@ecs.soton.ac.uk email] or speak to [http://ecs.soton.ac.uk/people/jsh2 Jon] immediately.) Your individual copy of the <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository is private to you and the COMP3207 teaching staff (who will be able to see any code you push) hence fellow students will not have access to your source code. '''Please do not fork your repository - you must use the repository we have created for you directly.'''
 
 The <code>ECS-COMP3207-1516/&lt;your-github-id&gt;-CW1</code> repository contains the initial implementation of ECS-MUD, together with essential documentation (a README file).
 
@@ -93,7 +93,6 @@ On this wiki you can find the resources you'll need to finish the implementation
 * The [[COMP3207-1516-cw1-notes|programmer’s notes]] (contains notes and hints to help you run and develop the MUD).
 * The [[COMP3207-1516-cw1-faq|FAQ]] (frequently asked questions).
 * The [[COMP3207-1516-cw1-strings|list of strings]] (an exhaustive list of which strings are expected to be used in each method).
-
 
 == Questions ==
 

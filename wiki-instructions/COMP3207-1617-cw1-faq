@@ -17,9 +17,9 @@ If you get copies of the same object from different places (i.e. as a result of 
 Make sure you've completed your changes to the <code>package.json</code> file. Note that you need to remove the angle brackets (< and >) around your usernames.
 
 ==Are all the strings we need in the Strings.js file==
-You '''must not''' use or create any custom strings for any function. The automated tests will check for the correct strings being used. If you have a query about what response string to use that isn't covered by the sample transcript or strings list then please ask. 
+You '''must not''' use or create any custom strings for any function. The automated tests will check for the correct strings being used. If you have a query about what response string to use that isn't covered by the sample transcript or strings list then please ask.
 
-==Can I @create multiple items with the same name?==
+==Can I @create (or @open or @ multiple items with the same name?==
 Yes, this is allowed, although it obviously will lead to potential problems if you happen to have two or more of them stored in the same place as you'll have difficulty referring to one of them! The automated test scripts will not try and create multiple items with the same name.
 
 ==How much code am I expected to write?==
@@ -32,7 +32,7 @@ The /[ -~]+/ refers to the complete range of '''printable''' ASCII characters. T
 No.
 
 ==Can we have an example of a room, exit and link being created?==
-Sure:`
+Sure:
 
 ''Note this assumes that you own the room in which you create the exit with @open, otherwise you would get the permission denied message''
 
@@ -54,7 +54,6 @@ Sure:`
 <<< office (#56)
 </code>
 
-
 ==How does "home" work in @link==
 ===...when setting a dropto?===
 Using <code>@link here=home</code> is identical to <code>@set here=temple</code>, so you you probably just call your @set perform method with the relevant arguments.
@@ -75,3 +74,36 @@ Just "go" and "take" (and their aliases).
 ==I'm stuck trying to implement '''@path'''. Help?==
 (This is supposed to be a challenge!). Hint: think about what algorithm you would use to find the shortest path in an unweighted (potentially cyclic) graph, and take a look at the <code>package.json</code> file to see if perhaps there might be a node library included that will help you.
 
+==I found a bug outside of Commands.js - should I fix it?==
+There might be a few known minor bugs in methods defined outside of Commands.js. If you find one, make sure that you mention it in the report & also drop Jon an email to let him know (just in case it's unknown to us!). These won't affect the automated testing, so it's not a problem if they are not fixed.
+
+==Is the description the only property that requires ownership to modify, and where should the objects be?==
+All of the @ commands that change properties require ownership, and possibly others too (the strings list on the wiki is a big giveaway - look for the permission denied string). Pretty much every game command (<code>page</code> being an obvious exception) requires that the object being used or changed be visible to the player (i.e. same room or inventory).
+
+==Is there any chance I could have an example of an @set interaction?==
+Sure - this shows an exit being created and locked and then the <code>anti_lock</code> property is set so to use the exit you must not be carrying the key.
+
+''Note this assumes that you own the room in which you create the exit with @open, otherwise you would get the permission denied message''
+
+<code>>>> @open door
+
+<<< Opened.
+
+>>> @create key
+
+<<< Created.
+
+>>> @lock door=key
+
+<<< Locked.
+
+>>> @set door=anti_lock
+
+<<< anti_lock set.
+</code>
+
+==What's Strings.exitBeingCarried (and strings.cantTakeLinkedExit) for?==
+This is part of a future feature in version 2 of ECS-MUD. Ignore it for this version!
+
+==Are all the strings we need in the list of strings on the wiki? why are some listed multiple times?==
+That list is generated from my implementation, so if I used a string twice in a method in Commands.js, it will appear twice in the list; obviously your implementations may differ. Some strings are not always listed (most specifically <code>strings.unknownCommand</code>) as in my implementation they are implicit through inheritance (i.e. I'm extending the <code>PropertyHandler</code>, but not overriding <code>validate</code>)
