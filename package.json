@@ -20,7 +20,7 @@
   "dependencies": {
     "async-bfs": "^0.1.9",
     "express": "^4.14.0",
-    "pug": "^2.0.0-beta6",
+    "pug": "^2.0.0-rc.4",
     "pg": "^4.1.1",
     "sequelize": "^3.24.3",
     "sequelize-fixtures": "^0.5.4",
@@ -29,6 +29,6 @@
     "ws": "^1.1.0"
   },
   "engines": {
-    "node": ">=0.10.30"
+    "node": ">=8.1.1"
   }
 }

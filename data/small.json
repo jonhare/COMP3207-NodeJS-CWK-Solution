@@ -276,7 +276,7 @@
         "model": "MUDObject",
         "data": {
             "id": 14,
-            "name": "Zepler North Stairwell",
+            "name": "Zepler North stairwell",
             "description": "You are stood in a stairwell. There are posters from student projects on the walls, and the floor is covered in a blue linoleum material that squeaks as you walk. There are doors to Levels 1 though 4 and onto the roof.",
             "failureMessage": null,
             "successMessage": null,
@@ -560,7 +560,7 @@
             "password": null,
             "createdAt": "2014-08-29T16:38:48.000Z",
             "updatedAt": "2014-08-29T16:38:48.000Z",
-            "targetId": null,
+            "targetId": 54,
             "locationId": 14,
             "ownerId": 2,
             "keyId": null
@@ -917,7 +917,7 @@
             "password": null,
             "createdAt": "2014-08-29T16:38:48.000Z",
             "updatedAt": "2014-08-29T16:38:48.000Z",
-            "targetId": null,
+            "targetId": 54,
             "locationId": 13,
             "ownerId": 2,
             "keyId": null
@@ -1108,6 +1108,132 @@
             "updatedAt": "2014-09-08T11:01:29.000Z",
             "targetId": 35,
             "locationId": 51,
+            "ownerId": 2,
+            "keyId": null
+        }
+    },
+        {
+        "model": "MUDObject",
+        "data": {
+            "id": 54,
+            "name": "Level 2 North Antechamber",
+            "description": "You are stood in a small L-shaped room with doors leading to the lift, the stairwell and the Teaching Laboratory.",
+            "failureMessage": null,
+            "successMessage": null,
+            "othersFailureMessage": null,
+            "othersSuccessMessage": null,
+            "type": "ROOM",
+            "flags": null,
+            "password": null,
+            "createdAt": "2017-09-26T08:41:50.865Z",
+            "updatedAt": "2017-09-26T08:44:41.487Z",
+            "targetId": null,
+            "locationId": null,
+            "ownerId": 2,
+            "keyId": null
+        }
+    },
+    {
+        "model": "MUDObject",
+        "data": {
+            "id": 55,
+            "name": "stairs;stairwell;out;stairwell door",
+            "description": null,
+            "failureMessage": null,
+            "successMessage": null,
+            "othersFailureMessage": null,
+            "othersSuccessMessage": null,
+            "type": "EXIT",
+            "flags": null,
+            "password": null,
+            "createdAt": "2017-09-26T08:45:55.525Z",
+            "updatedAt": "2017-09-26T08:46:45.509Z",
+            "targetId": 14,
+            "locationId": 54,
+            "ownerId": 2,
+            "keyId": null
+        }
+    },
+    {
+        "model": "MUDObject",
+        "data": {
+            "id": 56,
+            "name": "Teaching Laboratory",
+            "description": "You are stood in the Teaching Laboratory. Nothing much is happening at the moment. There is a door at the North end.",
+            "failureMessage": null,
+            "successMessage": null,
+            "othersFailureMessage": null,
+            "othersSuccessMessage": null,
+            "type": "ROOM",
+            "flags": null,
+            "password": null,
+            "createdAt": "2017-09-26T08:48:07.855Z",
+            "updatedAt": "2017-09-26T09:00:54.545Z",
+            "targetId": null,
+            "locationId": null,
+            "ownerId": 2,
+            "keyId": null
+        }
+    },
+    {
+        "model": "MUDObject",
+        "data": {
+            "id": 57,
+            "name": "Teaching Laboratory Door;lab door;lab",
+            "description": null,
+            "failureMessage": "The card lock on the door says 'Access Denied'.",
+            "successMessage": "You swipe your ID card and proceed through the door into the lab.",
+            "othersFailureMessage": "is denied access to the lab.",
+            "othersSuccessMessage": "swipes their ID card and proceeds through the door into the lab.",
+            "type": "EXIT",
+            "flags": null,
+            "password": null,
+            "createdAt": "2017-09-26T08:48:57.234Z",
+            "updatedAt": "2017-09-26T08:57:31.142Z",
+            "targetId": 56,
+            "locationId": 54,
+            "ownerId": 2,
+            "keyId": 24
+        }
+    },
+    {
+        "model": "MUDObject",
+        "data": {
+            "id": 58,
+            "name": "North Door;out;back",
+            "description": null,
+            "failureMessage": null,
+            "successMessage": null,
+            "othersFailureMessage": null,
+            "othersSuccessMessage": null,
+            "type": "EXIT",
+            "flags": null,
+            "password": null,
+            "createdAt": "2017-09-26T08:59:47.516Z",
+            "updatedAt": "2017-09-26T09:00:11.208Z",
+            "targetId": 54,
+            "locationId": 56,
+            "ownerId": 2,
+            "keyId": null
+        }
+    },
+    {
+        "model": "MUDObject",
+        "data": {
+            "id": 59,
+            "name": "lift",
+            "description": null,
+            "failureMessage": null,
+            "successMessage": "You press the call button for the lift, wait momentarily for it to arrive, and then step in once the doors have opened.",
+            "othersFailureMessage": null,
+            "othersSuccessMessage": "presses the call button for the lift, waits momentarily for it to arrive, and then steps in once the doors have opened.",
+            "type": "EXIT",
+            "flags": null,
+            "password": null,
+            "createdAt": "2017-09-26T09:11:32.996Z",
+            "updatedAt": "2017-09-26T09:11:32.996Z",
+            "targetId": 13,
+            "locationId": 54,
             "ownerId": 2,
             "keyId": null
         }
